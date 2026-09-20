@@ -1,0 +1,12 @@
+CompileFlags:
+  Add:
+    # OpenMPI
+    # module load openmpi
+    # mpic++ -show
+    # - "-I/apps/x86-64/apps/openmpi_4.1.7_gcc12/include"
+    # MPICH C++ bindings (deprecated)
+    # module load mpich
+    # mpicxx -show
+    - "-I/apps/x86-64/apps/spack_1.0.1/spack/opt/spack/linux-zen3/mpich-4.3.0-lyg2hzoteyymijyuhddl5s5bplzx75af/include"
+    # The two MPI implementations both come from the same header file and are incompatible. Comment one out
+    - "-pthread"

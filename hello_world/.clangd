@@ -1,0 +1,4 @@
+CompileFlags:
+  Add:
+    - "-I/apps/x86-64/apps/openmpi_4.1.7_gcc12/include"
+    - "-pthread"

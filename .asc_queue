@@ -1,0 +1,130 @@
+#
+#  This is a configuration file to customize the behavior
+#  of the queue scripts provided by the Alabama Supercomputer Center.
+#  These usually have names starting with "run" like "rung09".
+#
+#  Lines starting with # are comments that are ignored.
+#  Settings can be activated by removing the # at the beginning of the line
+#  or deactivated by putting a # at the beginning of the line,
+#  Do not put spaces before or after the = sign.
+#
+#  WARNING: Not all preferences work together.  For example, you
+#  will not be able to submit jobs if you set a queue name and
+#  an amount of memory that exceeds the limit for that queue.
+#
+
+#  start_time_pref controls the prompt for when to start your jobs
+#  If PROMPT the script will give you the option of starting a job later.
+#  If SOONEST all of your jobs will start as soon as possible.
+#start_time_pref=PROMPT
+start_time_pref=SOONEST
+
+#  job_name_pref specifies a job name behavior.
+#  If PROMPT then you will be asked to type a job name.
+#  If DEFAULT then it will generate a job name, usually from input file name
+#  Otherwise the specified string (no spaces) will ALWAYS be your job name 
+job_name_pref=PROMPT
+#job_name_pref=DEFAULT
+#job_name_pref=myjob
+
+#  queue_email_pref specifies when emails should be sent to 
+#  the email address(es) in your .forward file
+#  if DEFAULT it emails you when jobs abort with a failure
+#  a send abort messages on failure ('a' only is currently the same as DEFAULT)
+#  b send email when job begins
+#  5 send email when job reaches 50%
+#  8 send email when job reaches 80%
+#  9 send email when job reaches 90%
+#  r send email when job requeued
+#  t send email when job timeout
+#  f send email when job fails (same as a)
+#  l send email  for all
+#  e send email when job ends (the email will say it "terminated")
+#  n send no emails (cannot be used with a, b, or e)
+queue_email_pref=n
+#queue_email_pref=a
+#queue_email_pref=b
+#queue_email_pref=e
+#queue_email_pref=ab
+#queue_email_pref=ae
+#queue_email_pref=aet
+#queue_email_pref=be
+#queue_email_pref=abe
+#queue_email_pref=n
+
+#  queue_name_pref sets a name for the queue to use
+#  if PROMPT then you will be asked to type a queue name
+#  Otherwise, it can be set to a valid queue name
+queue_name_pref=PROMPT
+#queue_name_pref=express
+#queue_name_pref=small
+#queue_name_pref=medium
+#queue_name_pref=large
+#  The class queue is accessible to accounts with "cls" in the name
+#  It is for class assignments only, NOT research calculations
+#queue_name_pref=class
+#  The special queue is available by permission, 
+#  as described in the file /opt/asn/doc/moab/special_queue.txt
+#queue_name_pref=special
+#  The commercial queue is available to paying commercial customers.
+#queue_name_pref=commercial
+
+#  num_cpus_pref sets the number of conventional processor cores
+#  If PROMPT then you will be asked to enter a number of processors
+#  If DEFAULT then the minimum allowed by the queue will be requested
+#  Otherwise a number can be given.
+num_cpus_pref=PROMPT
+#num_cpus_pref=DEFAULT
+#num_cpus_pref=4
+#  For GPU jobs, requesting 1 processor gives you 1 CPU core and 1 GPU
+#  but gives you all of the cores on the GPU chip.
+
+#  cpu_time_pref sets the amount of time you are giving the job to run.
+#  Setting 20 hours for a 5 processor job, will give each processor 4 hours.
+#  if PROMPT then will be asked to enter a time limit.
+#  if DEFAULT then use the script default, usually the max allowed by the queue
+#  Otherwise a number can be given in the format HH:MM:SS
+cpu_time_pref=PROMPT
+#cpu_time_pref=DEFAULT
+#cpu_time_pref=20:00:00
+
+#  memory_pref sets the amount of memory the job gets.
+#  Setting 8gb to a 4 processor job, will give each processor 2gb.
+#  if PROMPT you will be asked to enter a memory amount
+#  if DEFAULT a default for the queue an number of processors will be used
+#  Otherwise a number can be given with units like 200mg or 4gb (no spaces)
+memory_pref=PROMPT
+#memory_pref=DEFAULT
+#memory_pref=1gb
+
+#  cluster_pref is ignored by most of the queue scripts.
+#  This affects just a few scripts that can prompt for dmc, asax, or any
+#  such as run_script and run_script_mpi
+#  cluster_pref does NOT tell other scripts to use a given cluster.
+#  if PROMPT you will be prompted for the cluster name.
+#  Otherwise enter "asax" or "dmc" or "any" or a colon separated list
+cluster_pref=PROMPT
+#cluster_pref=asax
+#cluster_pref=dmc
+#cluster_pref="asax|dmc"
+#cluster_pref=broadwell
+#cluster_pref=skylake
+#cluster_pref=milan
+#cluster_pref=avx2
+#cluster_pref=dmc77
+#cluster_pref=any
+
+#  gpu_pref is ignored by most of the queue scripts.
+#  This affects just a few scripts that can prompt for ampere, volta, or any
+#  such as run_gpu
+#  gpu_pref does NOT tell other scripts to use a gpu.
+#  if PROMPT you will be prompted for the gpu type.
+#  Otherwise enter "ampere" or "volta" or "any" or a colon separated list
+gpu_pref=PROMPT
+#gpu_pref=pascal
+#gpu_pref=volta
+#gpu_pref=ampere
+#gpu_pref=hopper
+#gpu_pref=any
+
+
