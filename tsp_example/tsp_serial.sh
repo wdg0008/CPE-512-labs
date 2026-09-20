@@ -6,18 +6,19 @@
 module load gcc
 
 #(re-)compiling programs with fast optimization
-g++ tsp_serial.cpp -o tsp_serial -Ofast
+# g++ tsp_serial.cpp -o tsp_serial -Ofast
+make
 
 # serial reference runs
 # redirect standard out to tsp_serial.txt 
-./tsp_serial 5   > tsp_serial.txt
-./tsp_serial 6  >> tsp_serial.txt
-./tsp_serial 7  >> tsp_serial.txt
-./tsp_serial 8  >> tsp_serial.txt
-./tsp_serial 9  >> tsp_serial.txt
-./tsp_serial 10 >> tsp_serial.txt
-./tsp_serial 11 >> tsp_serial.txt
-./tsp_serial 12 >> tsp_serial.txt
-./tsp_serial 13 >> tsp_serial.txt
-./tsp_serial 14 >> tsp_serial.txt
-./tsp_serial 15 >> tsp_serial.txt
+./tsp_serial.out 5   > tsp_serial.txt
+./tsp_serial.out 6  >> tsp_serial.txt
+./tsp_serial.out 7  >> tsp_serial.txt
+./tsp_serial.out 8  >> tsp_serial.txt
+./tsp_serial.out 9  >> tsp_serial.txt
+./tsp_serial.out 10 >> tsp_serial.txt
+./tsp_serial.out 11 >> tsp_serial.txt
+./tsp_serial.out 12 >> tsp_serial.txt
+./tsp_serial.out 13 >> tsp_serial.txt
+./tsp_serial.out 14 >> tsp_serial.txt
+./tsp_serial.out 15 >> tsp_serial.txt
