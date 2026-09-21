@@ -178,6 +178,9 @@ wells_class
 *.bk
 *_test.sh
 
+# For MATLAB
+*.asv
+
 # GCC binaries without filename extensions
 **/heat_1d_PTH[1-5]
 **/heat_1d_serial
