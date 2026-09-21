@@ -25,6 +25,7 @@ using namespace std;
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string.h>
 #include <sys/time.h>
 
