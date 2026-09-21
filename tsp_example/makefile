@@ -4,20 +4,20 @@
 CXX = g++
 CXXFLAGS = -Wall -Wpedantic -std=c++20 -Ofast
 
-all: tsp_serial tsp_PTH1 tsp_PTH2 tsp_OMP
+all: tsp_serial.out tsp_PTH1.out tsp_PTH2.out tsp_OMP.out
 
-tsp_serial: tsp_serial.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@.out
+tsp_serial.out: tsp_serial.cpp
+	$(CXX) $(CXXFLAGS) $^ -o $@
 
-tsp_PTH1: tsp_PTH1.cpp
-	$(CXX) $(CXXFLAGS) -pthread $^ -o $@.out
+tsp_PTH1.out: tsp_PTH1.cpp
+	$(CXX) $(CXXFLAGS) -pthread $^ -o $@
 
-tsp_PTH2: tsp_PTH2.cpp
-	$(CXX) $(CXXFLAGS) -pthread $^ -o $@.out
+tsp_PTH2.out: tsp_PTH2.cpp
+	$(CXX) $(CXXFLAGS) -pthread $^ -o $@
 
-tsp_OMP: tsp_OMP.cpp
-	$(CXX) $(CXXFLAGS) -fopenmp $^ -o $@.out
+tsp_OMP.out: tsp_OMP.cpp
+	$(CXX) $(CXXFLAGS) -fopenmp $^ -o $@
 
 .PHONY: clean
 clean:
-	rm -f *.txt *.i* *.o*
+	rm -f *.i* *.o*
