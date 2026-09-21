@@ -26,12 +26,14 @@
 // g++ tsp_PTH2.cpp -o tsp_PTH2 -lpthread -Ofast
 //
 using namespace std;
+// #include <memory>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
 #include <string.h>
 #include <sys/time.h>
+#include <pthread.h>
 
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
@@ -161,10 +163,7 @@ int best_city_visit_order[MX_CITIES],best_cost=MAX_INT; //set to worst value pos
 
 // Declare pthread Mutext Lock Variable so it is visible in thread
 // functions
-//
-//    Enter your code here
-//          ¯\_(ツ)_/¯ 
-//
+pthread_mutex_t mlock;
 
 int next_city(int city_start, bool *city_msk, int num_cities) {
    city_start++;
@@ -179,7 +178,8 @@ int next_city(int city_start, bool *city_msk, int num_cities) {
 
 // city tours generator
 void city_tours_gen(int city_order_slot, int *city_visit_order,bool *city_msk,
-        int cum_tour_cost) {
+   int cum_tour_cost, int *thread_best_city_visit_order,
+   int *thread_best_cost) {
    //                   ^^^^
    //    Enter your code here
    //          ¯\_(ツ)_/¯ 
@@ -222,7 +222,8 @@ void city_tours_gen(int city_order_slot, int *city_visit_order,bool *city_msk,
          // routine again with the slot number being where the next city
          // will be placed in the city visit order permutation 
          city_tours_gen(city_order_slot+1,city_visit_order,
-            city_msk, city_tour_cost);
+            city_msk, city_tour_cost, thread_best_city_visit_order,
+            thread_best_cost);
          //                        ^^^^
          //    Enter your code here                       
          //          ¯\_(ツ)_/¯
@@ -276,9 +277,9 @@ void city_tours_gen(int city_order_slot, int *city_visit_order,bool *city_msk,
       // reference scalar whose value needs to be returned to the
       // calling function. 
       // i.e. *thread_best_cost        
-      if (cum_tour_cost<best_cost) {
-         save_order (best_city_visit_order,num_cities,city_visit_order);
-         best_cost = cum_tour_cost;
+      if (cum_tour_cost<*thread_best_cost) {
+         save_order (thread_best_city_visit_order,num_cities,city_visit_order);
+         *thread_best_cost = cum_tour_cost;
       }
 
       // uncomment to view all city tours
@@ -298,12 +299,8 @@ void *thread_total(void * arg) {
    // You can make these thread-private by declaring these
    // variables inside the thread 
     
-   //   int thread_best_city_visit_order[MX_CITIES];
-   //   int thread_best_cost=MAX_INT; //set to worst value poss.
-   //
-   //    Enter your code here
-   //          ¯\_(ツ)_/¯
-   //
+   int thread_best_city_visit_order[MX_CITIES];
+   int thread_best_cost=MAX_INT; //set to worst value poss.
 
    int city_visit_order[MX_CITIES];
    bool city_msk[MX_CITIES];
@@ -328,7 +325,8 @@ void *thread_total(void * arg) {
 
    // explore all possible (n-2)! city visit orders by calling this 
    // recursive routine starting at level 2 of recursion tree 
-   city_tours_gen(2,city_visit_order,city_msk,city_cost_matrix[0][tid]);
+   city_tours_gen(2,city_visit_order,city_msk,city_cost_matrix[0][tid],
+      thread_best_city_visit_order,&thread_best_cost);
    //                                                               ^^^^
    //    Enter your code here                       
    //          ¯\_(ツ)_/¯
@@ -360,9 +358,13 @@ void *thread_total(void * arg) {
    // Make the comparison and the copy operation atomic using a 
    // MUTEX lock.
    //
-   //    Enter your code here
-   //          ¯\_(ツ)_/¯
-   //
+   pthread_mutex_lock(&mlock);
+   if (thread_best_cost<best_cost) {
+      save_order(best_city_visit_order,num_cities,
+         thread_best_city_visit_order);
+      best_cost=thread_best_cost;
+   }
+   pthread_mutex_unlock(&mlock);
 
    return arg;
 }
@@ -370,10 +372,12 @@ void *thread_total(void * arg) {
 void tour_search(void) {
    
    // dynamically allocate threads[num_cities] on heap
-   pthread_t threads[num_cities]; 
+   // pthread_t threads[num_cities]; 
+   unique_ptr<pthread_t[]> threads = make_unique<pthread_t[]>(num_cities);
 
    // dynamically allocate ids[num_cities] on heap 
-   int ids[num_cities];
+   // int ids[num_cities];
+   unique_ptr<int[]> ids = make_unique<int[]>(num_cities);
 
    // load logical id structure array -- start numbering at 1
    for (int tid=0; tid<num_cities; tid++) {
@@ -381,10 +385,7 @@ void tour_search(void) {
    }
 
    // initialize your globally declared MUTEX variable
-   //
-   //    Enter your code here
-   //          ¯\_(ツ)_/¯ 
-   //
+   pthread_mutex_init(&mlock,NULL);
 
    // Generate one thread per number of cities left at level 1
    // (in other words num_cities-1 threads -- so each thread processes
@@ -419,9 +420,7 @@ void tour_search(void) {
 
    // destroy your globally declared MUTEX variable
    //
-   //    Enter your code here
-   //          ¯\_(ツ)_/¯ 
-   //
+   pthread_mutex_destroy(&mlock);
 }
 
 int main(int argc, char *argv[]) {
