@@ -29,14 +29,12 @@ end
 C = zeros(3,1); % estimate of constant multiple of O(n!)
 s = zeros(3,1); % estimate of slope of ln, which would be a linear power
 
+fprintf("Execution Time Analysis\n");
 figure;
 for i = 1:3
     [C(i), s(i)] = fitFactorial(N{i}, T{i});
-
-    fprintf("\nBeginning of %s case\n", cases(i));
-    fprintf("T(n) = %.4e * n! seconds\n", C(i));
-    fprintf("Linear regression slope is %g.\n", s(i));
-    disp("A slope near 1 means this is a good fit.")
+    fprintf("%s execution time fit: T(n) = %.4e * n! seconds (slope %.3f)\n", ...
+        cases(i), C(i), s(i));
 
     subplot(3,2,(2*i-1))
     plot(N{i}, T{i});
@@ -53,40 +51,61 @@ for i = 1:3
     grid on;
 end
 
-%% Efficiency
+%% Parallel performance metrics
 
+% pre-allocate cell arrays for the metrics
+speedup = cell(2,1);
 eff = cell(2,1);
+cost = cell(2,1);
 
-figure;
-for i = 1:length(eff)
-    j = i+1; % ignore the serial case
-    % index serial time to ignore extra samples at the end
-    eff{i} = T{1}(1:length(T{j})) ./ (N{j} .* T{j});
-
-    subplot(1,2,i);
-    plot(N{1}(1:length(N{j})), eff{i});
-end
-
-%% Cost
-
+% pre-allocate linear regression parameters
 C_cost = zeros(2,1);
 s_cost = zeros(2,1);
 
-cost = cell(2,1);
-for i = 1:length(cost)
-    j = i + 1; % adjust for element 1 being serial
-    L = length(N{j}); % how many points to operate on
-    cost{i} = N{j} .* T{j};
-    [C_cost(i), s_cost(i)] = fitFactorial(N{1}(1:L), cost{i});
+fprintf("\nCost Fit Analysis\n");
+figure;
+for i = 1:2
+    j = i + 1;
 
-    fprintf("%s cost fit: %.4e * n! city-seconds (slope %.3f)\n", ...
+    % Number of threads produced by this implementation
+    % For PTH1 and PTH2: one thread for each city except the starting city
+    p = N{j} - 1; % already appropriate length
+
+    % Match serial and parallel measurements
+    L = length(N{j});
+    Tserial = T{1}(1:L);
+    Tparallel = T{j};
+
+    % Performance metrics
+    speedup{i} = Tserial ./ Tparallel;
+    eff{i} = speedup{i} ./ p;
+    cost{i} = p .* Tparallel;
+
+    % Fit cost to C*n!
+    [C_cost(i), s_cost(i)] = fitFactorial(N{j}, cost{i});
+
+    fprintf("%s cost fit: C(n) = %.4e * n! processor-seconds (slope %.3f)\n", ...
         cases(j), C_cost(i), s_cost(i));
-    
-    subplot(1,2,i);
+
+    subplot(3,2,i);
     plot(N{j}, cost{i});
     xlabel("Number of Cities");
-    ylabel("Cost (city-seconds)");
+    ylabel("Cost (processor-seconds)");
     title(sprintf("%s TSP Cost", cases(j)));
+    grid on;
+
+    subplot(3,2,i+2);
+    plot(N{j}, speedup{i});
+    xlabel("Number of Cities");
+    ylabel("Speedup");
+    title(sprintf("%s Speedup", cases(j)));
+    grid on;
+
+    subplot(3,2,i+4);
+    plot(N{j}, eff{i});
+    xlabel("Number of Cities");
+    ylabel("Efficiency");
+    title(sprintf("%s Efficiency", cases(j)));
     grid on;
 end
 
