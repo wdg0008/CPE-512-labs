@@ -180,10 +180,3 @@ wells_class
 
 # For MATLAB
 *.asv
-
-# GCC binaries without filename extensions
-**/heat_1d_PTH[1-5]
-**/heat_1d_serial
-**/hello_world_MPI
-**/hello_world_OMP
-**/hello_world_PTH
