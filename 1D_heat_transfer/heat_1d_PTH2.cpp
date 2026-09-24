@@ -3,7 +3,6 @@
 //                             Cyclic Distribution of Active points
 //                             Two Thread Generation Phases per Iteration
 // g++ heat_1d_PTH2.cpp -o heat_1d_PTH2 -lpthread
-using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -11,6 +10,8 @@ using namespace std;
 #include <string.h>
 #include <sys/time.h>
 #include <pthread.h>
+
+using namespace std;
 
 /* copied from mpbench */
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
