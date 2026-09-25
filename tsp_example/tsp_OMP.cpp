@@ -23,21 +23,17 @@
 // compilation:
 // g++ tsp_OMP.cpp -o tsp_OMP -fopenmp -Ofast
 //
-using namespace std;
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
-#include <string.h>
+// #include <iomanip>
+// #include <string.h>
 #include <sys/time.h>
 
+#include <omp.h>  // added
 
-//    Enter your code here                       
-//          ¯\_(ツ)_/¯
-// if you are using an OpenMP API call such as
-// set_num_threads() then you need to include 
-// the omp.h library
-//  i.e. #include <omp.h> 
+using namespace std;
 
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
@@ -261,12 +257,6 @@ void tour_search(void) {
    // thread best_cost as being private, and firstprivate, using
    // the corresponding clauses of the #pragma omp parallel directive
    //
-   //   int thread_best_city_visit_order[MX_CITIES];
-   //   int thread_best_cost=MAX_INT; //set to worst value poss.
-   //
-   //    Enter your code here
-   //          ¯\_(ツ)_/¯
-   //
 
    int city_visit_order[MX_CITIES];
    bool city_msk[MX_CITIES];
@@ -291,6 +281,7 @@ void tour_search(void) {
    // ********* or by executing the OpenMP set_num_threads() function call 
    // ********* prior to entering the parallel region of your code.
 
+   omp_set_num_threads(num_cities-1);
 
    //    Enter your code here                       
    //          ¯\_(ツ)_/¯
@@ -309,69 +300,83 @@ void tour_search(void) {
    // ********* private clauses in the #pragma omp parallel. They are already
    // ********* made thread-private by the scoping rules of C++ and OpenMP.
 
+   #pragma omp parallel firstprivate(city_msk, city_visit_order)
+   {
+      int thread_best_city_visit_order[MX_CITIES];
+      int thread_best_cost=MAX_INT; //set to worst value poss.
 
-   //    Enter your code here                       
-   //          ¯\_(ツ)_/¯
-   // ++++++++ inside the parallel region utilize a #pragam omp for  
-   // ++++++++ work-sharing directive that applies to the following for
-   // ++++++++ loop to allocate separate iterations to individual threads  
-   for (int city=1;city<num_cities;city++) {
-       
-      // place current city in second slot of the city_visit_order (slot 1)
-      city_visit_order[1]=city;
-
-      city_msk[city]=true;   // mask out this number so it cannot
-                             // be used again at this level
-      // explore all possible (n-2)! city visit orders by calling this 
-      // recursive routine starting at level 2 of recursion tree 
-      city_tours_gen(2,city_visit_order,city_msk,city_cost_matrix[0][city],
-         best_city_visit_order, best_cost);
-      //                  ^^^^
       //    Enter your code here                       
       //          ¯\_(ツ)_/¯
-      //
-      // Replace the shared variables best_city_visit_order, and best_cost
-      // in the parameter list so that these arguments refer to the thread-
-      // private variables thread_best_city_visit_order and thread_best_cost 
-      // so that these thread-private variables can be accessed within the 
-      // the city_tours_gen() function. Pass the pointers to these variables.
-      // The thread_best_city_visit_order is an array so it is automatically 
-      // treated as a pointer, but the thread_best_cost is a scalar which
-      // has been declared within the city_tours_gen() function as a C++
-      // reference variable which allows the city_tours_gen() function to
-      // return its value without the need for using the & operator here to
-      // pass a pointer to its location. The & operator, instead, was used
-      // in the declaration of the formal parameter declaration inside the 
-      // city_tours_gen() function, which made it possible to pass-by-reference
-      // in this manner (and makes for more readable code).
-      // (The best_city_visit_order array is also passed by reference, 
-      // but we do should not use the & operator because arrays are assumed in 
-      // C/C++ to pass a pointer to its beginning element when the array name 
-      // as an argument when a function is called. This in effect makes array
-      // parameters such as this automatically call-by-reference.)
-      //  
-      //  e.g.  change the last two parameters in the parameter list to
-      //    city_tours_gen(...,thread_best_city_visit_order, thread_best_cost);
-   
+      // ++++++++ inside the parallel region utilize a #pragam omp for  
+      // ++++++++ work-sharing directive that applies to the following for
+      // ++++++++ loop to allocate separate iterations to individual threads  
+      #pragma omp for
+      for (int city=1;city<num_cities;city++) {
+         
+         // place current city in second slot of the city_visit_order (slot 1)
+         city_visit_order[1]=city;
 
-      //
-      //    Enter your code here
-      //          ¯\_(ツ)_/¯
-      //
-      // while still in the OMP parallel region but after the call to 
-      // city_tours_gen() function, create an OpenMP critical region using
-      // the #pragma omp critical that contains the code that will atomically 
-      // check your thread_best_cost against the shared variable, best_cost
-      // and then use the save_order() function to copy the elements of the 
-      // thread_best_city_visit_order array into the best_city_visit_order 
-      // array and update the best_cost with the thread_best_cost when 
-      // thread_best_cost is less than best_cost.
+         city_msk[city]=true;   // mask out this number so it cannot
+                              // be used again at this level
+         // explore all possible (n-2)! city visit orders by calling this 
+         // recursive routine starting at level 2 of recursion tree 
+         city_tours_gen(2,city_visit_order,city_msk,city_cost_matrix[0][city],
+            thread_best_city_visit_order, thread_best_cost);
+         //                  ^^^^
+         //    Enter your code here                       
+         //          ¯\_(ツ)_/¯
+         //
+         // Replace the shared variables best_city_visit_order, and best_cost
+         // in the parameter list so that these arguments refer to the thread-
+         // private variables thread_best_city_visit_order and thread_best_cost 
+         // so that these thread-private variables can be accessed within the 
+         // the city_tours_gen() function. Pass the pointers to these variables.
+         // The thread_best_city_visit_order is an array so it is automatically 
+         // treated as a pointer, but the thread_best_cost is a scalar which
+         // has been declared within the city_tours_gen() function as a C++
+         // reference variable which allows the city_tours_gen() function to
+         // return its value without the need for using the & operator here to
+         // pass a pointer to its location. The & operator, instead, was used
+         // in the declaration of the formal parameter declaration inside the 
+         // city_tours_gen() function, which made it possible to pass-by-reference
+         // in this manner (and makes for more readable code).
+         // (The best_city_visit_order array is also passed by reference, 
+         // but we do should not use the & operator because arrays are assumed in 
+         // C/C++ to pass a pointer to its beginning element when the array name 
+         // as an argument when a function is called. This in effect makes array
+         // parameters such as this automatically call-by-reference.)
+         //  
+         //  e.g.  change the last two parameters in the parameter list to
+         //    city_tours_gen(...,thread_best_city_visit_order, thread_best_cost);
+      
 
-      city_msk[city]=false;  // unmask (release) this city so it
-                             // can be used again by other
-                             // city visit order permutations
+         #pragma omp critical
+         {
+            if (thread_best_cost < best_cost) {
+               save_order(best_city_visit_order, num_cities,
+                          thread_best_city_visit_order);
+               best_cost = thread_best_cost;
+            }
+         }
+         //
+         // while still in the OMP parallel region but after the call to 
+         // city_tours_gen() function, create an OpenMP critical region using
+         // the #pragma omp critical that contains the code that will atomically 
+         // check your thread_best_cost against the shared variable, best_cost
+         // and then use the save_order() function to copy the elements of the 
+         // thread_best_city_visit_order array into the best_city_visit_order 
+         // array and update the best_cost with the thread_best_cost when 
+         // thread_best_cost is less than best_cost.
+
+         city_msk[city]=false;  // unmask (release) this city so it
+                              // can be used again by other
+                              // city visit order permutations
+
+      }
 
    }
+
+   
 }
 
 int main(int argc, char *argv[]) {
