@@ -6,18 +6,18 @@
 module load gcc
 
 #(re-)compiling programs with fast optimization
-g++ tsp_OMP.cpp -o tsp_OMP -fopenmp -Ofast
+make
 
 #OpenMP runs
 #redirect standard out to tsp_OMP.txt 
-./tsp_OMP 5   > tsp_OMP.txt
-./tsp_OMP 6  >> tsp_OMP.txt
-./tsp_OMP 7  >> tsp_OMP.txt
-./tsp_OMP 8  >> tsp_OMP.txt
-./tsp_OMP 9  >> tsp_OMP.txt
-./tsp_OMP 10 >> tsp_OMP.txt
-./tsp_OMP 11 >> tsp_OMP.txt
-./tsp_OMP 12 >> tsp_OMP.txt
-./tsp_OMP 13 >> tsp_OMP.txt
-./tsp_OMP 14 >> tsp_OMP.txt
-./tsp_OMP 15 >> tsp_OMP.txt
+./tsp_OMP.out 5   > tsp_OMP.txt
+./tsp_OMP.out 6  >> tsp_OMP.txt
+./tsp_OMP.out 7  >> tsp_OMP.txt
+./tsp_OMP.out 8  >> tsp_OMP.txt
+./tsp_OMP.out 9  >> tsp_OMP.txt
+./tsp_OMP.out 10 >> tsp_OMP.txt
+./tsp_OMP.out 11 >> tsp_OMP.txt
+./tsp_OMP.out 12 >> tsp_OMP.txt
+./tsp_OMP.out 13 >> tsp_OMP.txt
+./tsp_OMP.out 14 >> tsp_OMP.txt
+./tsp_OMP.out 15 >> tsp_OMP.txt
