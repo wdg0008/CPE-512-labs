@@ -18,6 +18,7 @@ To execute on the Jetson Cluster
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
+#include <omp.h>
 #include <memory>
 using namespace std;
 
@@ -75,21 +76,28 @@ void init_temp(void) {
     }
 }
 void compute_temp() {
-
-    for (int i=0;i<num_iterations;i++) {
-        for (int j=1;j<=n;j++) {
-            for (int k=1;k<=n;k++) {
-                Temp_buf(j,k)=0.25*(Temp(j-1,k)+Temp(j+1,k)+
-                        Temp(j,k-1)+Temp(j,k+1));
+    #pragma omp parallel
+    {
+        for (int i = 0; i < num_iterations; i++) {
+            // magically divide the loop indices evenly w/ remainder
+            #pragma omp for schedule(static)
+            for (int row = 1; row <= n; row++) {
+                for (int col = 1; col <= n; col++) {
+                    Temp_buf(row, col) =
+                        0.25 * (Temp(row - 1, col) + Temp(row + 1, col)
+                            + Temp(row, col - 1) + Temp(row, col + 1));
+                }
             }
-        }
-        for (int j=1;j<=n;j++) {
-            for (int k=1;k<=n;k++) { 
-                Temp (j,k)=Temp_buf(j,k);
+
+            // OMP provides contiguous, balanced blocks with spread remainder
+            #pragma omp for schedule(static)
+            for (int row = 1; row <= n; row++) {
+                for (int col = 1; col <= n; col++) {
+                    Temp(row, col) = Temp_buf(row, col);
+                }
             }
         }
     }
-
 }
 // routine to display temperature values at each point including the 
 // boundary points
