@@ -28,6 +28,25 @@ using namespace std;
 #define TIMER_STOP      gettimeofday(&tv2, (struct timezone*)0)
 struct timeval tv1,tv2;
 
+template <typename T>
+class MatrixView {
+public:
+    MatrixView(T* data, int columns)
+        : data_(data), columns_(columns) {}
+
+    T& operator()(int row, int col) {
+        return data_[row * columns_ + col];
+    }
+
+    const T& operator()(int row, int col) const {
+        return data_[row * columns_ + col];
+    }
+
+private:
+    T* data_;
+    int columns_;
+};
+
 
 // Global Constants
 const int ROOM_TEMP=20;       // temperature everywhere except the fireplace
@@ -42,19 +61,12 @@ int total_rows;       // total number of rows including
 int total_cols;       // total number of columns including
                       // boundary condition columns
 
-double *temp;         // pointer to shared temperature
-                      // array row-ordered storage
-
-double *temp_buf;     // next iteration pointer to shared temperature
-                      // array row-ordered storage
-
-// Old style macro to give the illusion of 2D memory
-#define Temp(x,y) temp[(x)*total_cols+y] 
-#define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
+unique_ptr<double[]> temp;     // shared temperature, row-ordered storage
+unique_ptr<double[]> temp_buf; // next iteration, row-ordered storage
 
 // routine to initialize the temperature vector and the temperature at the
 // boundary
-void init_temp(void) {
+void init_temp(MatrixView<double>& temp_view) {
     const int fireplace_start = 0.3 * (double) n;
     const int fireplace_end = 0.7 * (double) n;
 
@@ -63,19 +75,18 @@ void init_temp(void) {
         for (int col=0;col<total_cols;col++) {
             if (row == 0) {
                 if (col<=fireplace_start || col > fireplace_end) {
-                    Temp(row,col) = ROOM_TEMP; // temp[row*total_cols+col];
+                    temp_view(row, col) = ROOM_TEMP;
+                } else {
+                    temp_view(row, col) = FIREPLACE_TEMP;
                 }
-                else {
-                    Temp(row,col) = FIREPLACE_TEMP;
-                }
-            }
-            else {
-                Temp(row,col) = ROOM_TEMP;
+            } else {
+                temp_view(row, col) = ROOM_TEMP;
             }
         }
     }
 }
-void compute_temp() {
+void compute_temp(MatrixView<double>& temp_view,
+                  MatrixView<double>& temp_buf_view) {
     #pragma omp parallel
     {
         for (int i = 0; i < num_iterations; i++) {
@@ -83,9 +94,11 @@ void compute_temp() {
             #pragma omp for schedule(static)
             for (int row = 1; row <= n; row++) {
                 for (int col = 1; col <= n; col++) {
-                    Temp_buf(row, col) =
-                        0.25 * (Temp(row - 1, col) + Temp(row + 1, col)
-                            + Temp(row, col - 1) + Temp(row, col + 1));
+                    temp_buf_view(row, col) = 0.25
+                        * (temp_view(row - 1, col)
+                        +  temp_view(row + 1, col)
+                        +  temp_view(row, col - 1)
+                        +  temp_view(row, col + 1));
                 }
             }
 
@@ -93,7 +106,7 @@ void compute_temp() {
             #pragma omp for schedule(static)
             for (int row = 1; row <= n; row++) {
                 for (int col = 1; col <= n; col++) {
-                    Temp(row, col) = Temp_buf(row, col);
+                    temp_view(row, col) = temp_buf_view(row, col);
                 }
             }
         }
@@ -101,11 +114,11 @@ void compute_temp() {
 }
 // routine to display temperature values at each point including the 
 // boundary points
-void print_temp(void) {
+void print_temp(const MatrixView<double>& temp_view) {
     cout << "Temperature Matrix Including Boundary Points" << endl;
     for (int row=0;row<total_rows;row++) {
         for (int col=0;col<total_cols;col++) {
-            cout << setw(5) << Temp(row,col) << " ";
+            cout << setw(5) << temp_view(row, col) << " ";
         }
         cout << endl << flush;
     }
@@ -115,12 +128,12 @@ void print_temp(void) {
 // This is used to perform a quick comparison of the
 // results to insure that modifications to the original
 // program did not affect the accuracy of the computation
-unsigned long long int checksum(void) {
+unsigned long long int checksum(const MatrixView<double>& temp_view) {
     void *ptr;
     unsigned long long int sum = 0;
     for (int row=0;row<total_rows;row++) {
         for (int col=0;col<total_cols;col++) {
-            ptr=(void *) &Temp(row,col);
+            ptr=(void *) &temp_view(row, col);
             sum += *(unsigned long long int *) ptr;
         }
     }
@@ -166,29 +179,29 @@ int main (int argc, char *argv[]){
 
     // dynamically allocate shared memory to
     // temp and temp_buf arrays
-    temp = new double [total_rows*total_cols]; 
-    temp_buf = new double [total_rows*total_cols];
+    temp = make_unique<double[]>(total_rows * total_cols);
+    temp_buf = make_unique<double[]>(total_rows * total_cols);
+
+    MatrixView<double> temp_view(temp.get(), total_cols);
+    MatrixView<double> temp_buf_view(temp_buf.get(), total_cols);
 
     // initialize temperature matrix
-    init_temp();
-
+    init_temp(temp_view);
     // begin timer
     TIMER_CLEAR;
     TIMER_START;
 
     // compute new temps
-    compute_temp(); 
-
+    compute_temp(temp_view, temp_buf_view);
     // stop timer
     TIMER_STOP;
 
     // print out the results if there is no suppress output argument
     if (argc==3) {
-        print_temp(); // print out the results
-        // print time in normal human readable format
+        print_temp(temp_view); // print out the results
         cout << "Execution Time = " << TIMER_ELAPSED << " Seconds"
              << endl;
-        cout << "64 bit Checksum = " << checksum() << endl;
+        cout << "64 bit Checksum = " << checksum(temp_view) << endl;
     }
     // if there exists a 4th argument, then suppress the output
     else {
@@ -202,17 +215,15 @@ int main (int argc, char *argv[]){
         }
         // print 64 bit checkSum
         else if (*argv[3]=='S') {
-            cout << "64 bit Checksum = " << checksum() << endl;
+            cout << "64 bit Checksum = " << checksum(temp_view) << endl;
         }
         else if (*argv[3]=='H') {
            // print time and Checksum in normal human readable format
            cout << "Number of active data points =" << n << endl;
            cout << "Execution Time = " << TIMER_ELAPSED << " Seconds"
                 << endl;
-            cout << "64 bit Checksum = " << checksum() << endl;
+            cout << "64 bit Checksum = " << checksum(temp_view) << endl;
         }
     }
 
-    delete temp;
-    delete temp_buf;
 }
