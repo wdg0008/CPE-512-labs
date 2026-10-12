@@ -27,9 +27,10 @@ Compilation on asax.asc.edu
 
 */
 
-using namespace std;
 #include <iostream>
 #include <omp.h>
+
+using namespace std;
 
 int main (int argc, char *argv[]) {
 

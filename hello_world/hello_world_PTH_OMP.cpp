@@ -27,7 +27,6 @@ Note2: two while(1) infinite loop statements are comment out. If they are
 
 */
 
-using namespace std;
 #include <iostream>
 
 #include <stdio.h>
@@ -38,6 +37,8 @@ using namespace std;
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/syscall.h>
+
+using namespace std;
 
 pthread_mutex_t MUTEX; // globaly defined lock variable used to insure
                        // uninterrupted print operations from each thread
@@ -172,8 +173,8 @@ int main(int argc,char *argv[])
        << endl << flush;
 
    pthread_mutex_unlock(&MUTEX); // exit critical region
-   delete threads;
-   delete ids; 
+   delete[] threads;
+   delete[] ids; 
    return(0);
 }
 

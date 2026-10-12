@@ -17,13 +17,13 @@ File: hello_world_PTH.cpp
 
 */
 
-using namespace std;
 #include <iostream>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+
+using namespace std;
 
 pthread_mutex_t MUTEX; // globaly defined lock variable used to ensure
                        // uninterrupted print operations from each thread
