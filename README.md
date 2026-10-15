@@ -48,8 +48,18 @@ The makefile is being rewritten to work on macs, but that is still in-progress.
 
 ### Windows
 
+The easiest way to get started is to use `gcc` like before. It hasn't been implemented yet, but this would ideally allow for a single makefile to detect your OS and set appropriate variables/flags with some imports. This is a low priority and won't be added until after OS X builds are working, as it will be much harder.
+
 [MSVC support for OpenMP](https://learn.microsoft.com/en-us/cpp/build/reference/openmp-enable-openmp-2-0-support) is limited to the 2.0 standard from 2002, and you can get a little further with `/openmp:llvm` for some (experimental!) support for more modern features.
 
 ```powershell
 cl .\hello_world_OMP.cpp /EHsc /std:c++20 /Zc:preprocessor /openmp
 ```
+
+You can install the [Microsoft MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) implementation with the following command in Windows 11:
+
+```powershell
+winget install Microsoft.msmpi
+```
+
+Hasn't been tested yet and requires some additional setup. The MSMPI project seems dead, with only one patch release in the last 5 years, but it isn't makred deprecated--yet.
