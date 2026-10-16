@@ -21,11 +21,11 @@ hello_world.out: hello_world.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 hello_world_MPI.out: hello_world_MPI.cpp
-# 	module load openmpi
+	module load openmpi
 	mpic++ $< -o $@
 
 hello_world_MPI2.out: hello_world_MPI2.cpp
-# 	module load mpich
+	module load mpich
 	mpic++ $< -o $@
 
 hello_world_OMP.out: hello_world_OMP.cpp
