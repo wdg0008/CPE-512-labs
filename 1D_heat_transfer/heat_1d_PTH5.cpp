@@ -16,6 +16,9 @@
 #include <cassert>
 #include <memory>
 
+// for macOS pthread_barrier implementation
+#include "pthread_barrier.h"
+
 using namespace std;
 
 /* copied from mpbench */

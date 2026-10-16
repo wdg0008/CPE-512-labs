@@ -25,7 +25,6 @@
 // compilation:
 // g++ tsp_PTH2.cpp -o tsp_PTH2 -lpthread -Ofast
 //
-using namespace std;
 // #include <memory>
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,6 +33,8 @@ using namespace std;
 #include <string.h>
 #include <sys/time.h>
 #include <pthread.h>
+
+using namespace std;
 
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
