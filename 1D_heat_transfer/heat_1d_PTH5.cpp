@@ -15,9 +15,13 @@
 #include <pthread.h>
 #include <cassert>
 #include <memory>
+#include <unistd.h>
 
-// for macOS pthread_barrier implementation
-#include "pthread_barrier.h"
+// Check if optional feature is undefined or marked as unsupported
+#if !defined(_POSIX_BARRIERS) || _POSIX_BARRIERS == -1
+    // fallback implementation for macOS
+    #include "pthread_barrier.h"
+#endif
 
 using namespace std;
 
