@@ -14,11 +14,12 @@ To execute on the Jetson Cluster
          # for 10 iterations 
 */
 
-using namespace std;
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
+
+using namespace std;
 
 #define TIMER_CLEAR  (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)

@@ -6,7 +6,6 @@
 //                             which occurs at the beginning of the
 //                             compute_temp function
 // g++ heat_1d_PTH3.cpp -o heat_1d_PTH3 -lpthread
-using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
@@ -14,6 +13,15 @@ using namespace std;
 #include <string.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <unistd.h>
+
+// Check if optional feature is undefined or marked as unsupported
+#if !defined(_POSIX_BARRIERS) || _POSIX_BARRIERS == -1
+    // fallback implementation for macOS
+    #include "pthread_barrier.h"
+#endif
+
+using namespace std;
 
 /* copied from mpbench */
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
@@ -216,6 +224,6 @@ int main (int argc, char *argv[]){
         }
     }
 
-    delete temp;
+    delete[] temp;
 
 }

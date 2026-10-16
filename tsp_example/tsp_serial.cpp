@@ -12,13 +12,14 @@
 // compilation:
 // g++ tsp_serial.cpp -o tsp_serial -Ofast
 //
-using namespace std;
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
 #include <string.h>
 #include <sys/time.h>
+
+using namespace std;
 
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)

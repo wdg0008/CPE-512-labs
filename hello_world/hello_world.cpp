@@ -18,8 +18,10 @@ Compilation on ascx.asc.edu
      pgc++ hello_world.cpp -o hello_world_hpc
 */
 
-using namespace std;
 #include <iostream>
+
+using namespace std;
+
 int main (int argc, char *argv[]) {
    #ifdef __PGI
       // Compiled with the NVIDA HPC Compiler

@@ -1,11 +1,12 @@
 // 1-D temperature Example  -- Single-Threaded Program
 // compilation
 // g++ heat_1d_serial.cpp -o heat_1d_serial 
-using namespace std;
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
+
+using namespace std;
 
 /* copied from mpbench */
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
@@ -51,7 +52,7 @@ void compute_temp(double * temp, int active_points, int num_iterations) {
             }
         }
     }
-    delete temp_buf;
+    delete [] temp_buf;
 }
 
 // routine to display temperature values at each point including the 
@@ -154,7 +155,7 @@ int main (int argc, char *argv[]){
         }
     }
 
-    delete temp;
+    delete [] temp;
 
     return (0);
 }
