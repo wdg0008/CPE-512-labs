@@ -1,4 +1,4 @@
-# README
+# CPE 512 Lab Code
 
 This repository contains code written for [CPE 512 - Intro to Parallel Programming](https://catalog.uah.edu/#/courses/6732c244744e35849f2c6ea9) at [The University of Alabama in Huntsville](https://uah.edu).
 
@@ -12,14 +12,25 @@ There are three main technologies/frameworks used to parallelize constructs in t
 
 It is organized with subfolders for each unit in the class, with most of the code based on serial versions originally provided by the instructor.
 
-## Setup
+This builds and runs easily on ASAX right now. If you want to try this at home, the setup 
+details vary widely by platform and are listed below based on OS and compiler vendor. Once the prerequisites are installed, run `make -j N` to build in parallel on `N` many processors.
 
-### Linux
+>[!Warning]
+>The individual makefiles in each folder cannot be build independently, as they depend on exported variables from the main one. Instead, run `make <subfolder_name>` to compile just one unit.
 
-You need to install `gcc` version 12 or later from your package manager, along with a few other things.
-**This list is definitely NOT comprehensive, and will need to be updated.**
+## Linux
 
-### Mac OS X
+You need to install several packages from your distribution's package manager (YUM, pacman, apt, etc.). To get this working on Ubuntu 26.04 LTS, I ran the following:
+
+```bash
+sudo apt update && sudo apt upgrade
+sudo apt install build-essential gdb openmpi-bin openmpi-common libopenmpi-dev
+```
+
+>[!Note] 
+>This list of packages will vary widely form one distribution to another, but something generally similar should be pretty easy to find.
+
+## Mac OS X
 
 Install Xcode or the Xcode Command Line Tools version 16 or later, then run the following in [Homebrew](https://brew.sh) to install missing dependencies that Apple does not ship.
 
@@ -28,27 +39,26 @@ brew install libomp
 brew install openmpi
 ```
 
-### Windows
+The `makefile` will also build some code that implements the optional `pthread_barrier_t` type from the POSIX standard which macOS does not provide.
 
-Install `gcc` from [MSYS2](https://msys2.org) to use the same compiler options and build code that uses pthreads.
+## Windows
 
-If you want to try it, install the latest version of Visual Studio with the "C++ Development Workload" and the "Clang tools for Visual Studio" optional component. It cannot do pthread and only has old, outdated OpenMP support (which is sufficient for most of this code).
+The `makefile` does not work yet on windows, but could probably be adapted to.
 
-## Building
+### MSYS2
 
-The build process depends on which operating system you use and what framework your code is using. The goal is to run a single makefile for everything, but that's not implemented yet.
+Install `gcc` from [MSYS2](https://msys2.org) to use the same compiler options and build pthreads code.
 
-### Linux
+```bash
+pacman -Syu base-devel mingw-w64-ucrt-x86_64-toolchain
+```
 
-Currently, you can use makefiles for each unit on ASAX but have to build everything yourself otherwise. Adapting for general Linux should be easy.
+>[!Note]
+>Probably needs some other stuff, still have to test with what is actually required in UCRT64 environment.
+>
+### MSVC
 
-### Mac OS X
-
-The makefile is being rewritten to work on macs, but that is still in-progress.
-
-### Windows
-
-The easiest way to get started is to use `gcc` like before. It hasn't been implemented yet, but this would ideally allow for a single makefile to detect your OS and set appropriate variables/flags with some imports. This is a low priority and won't be added until after OS X builds are working, as it will be much harder.
+If you want to try it, install the latest version of Visual Studio with the "C++ Development Workload" and the "Clang tools for Visual Studio" optional component. Being the Windows-native compiler and toolchain, Visual Studio has no concept of or libraries for POSIX threads, and an implementation for MSVC would be far beyond the scope of this repository (and likely complex enough for enterprise support and usage).
 
 [MSVC support for OpenMP](https://learn.microsoft.com/en-us/cpp/build/reference/openmp-enable-openmp-2-0-support) is limited to the 2.0 standard from 2002, and you can get a little further with `/openmp:llvm` for some (experimental!) support for more modern features.
 
@@ -62,4 +72,4 @@ You can install the [Microsoft MPI](https://learn.microsoft.com/en-us/message-pa
 winget install Microsoft.msmpi
 ```
 
-Hasn't been tested yet and requires some additional setup. The MSMPI project seems dead, with only one patch release in the last 5 years, but it isn't makred deprecated--yet.
+Hasn't been tested yet and requires some additional setup. The MSMPI project seems dead, with only one patch release in the last 5 years, but it isn't marked deprecated--yet.
