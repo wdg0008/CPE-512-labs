@@ -15,6 +15,8 @@ include $(ROOT_DIR)macos.mk
 PTHREAD_BARRIER_TARGET := $(PTHBAR_LIB)
 else ifeq ($(HOST_OS),Linux)
 include $(ROOT_DIR)linux.mk
+else ifneq ($(filter MINGW64_NT%,$(HOST_OS)),)
+include $(ROOT_DIR)msys2.mk
 else
 	$(error Unsupported operating system: $(HOST_OS))
 endif
