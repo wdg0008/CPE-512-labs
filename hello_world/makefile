@@ -10,7 +10,8 @@ EXES := hello_world.out hello_world_OMP.out hello_world_PTH.out \
 
 UNAME_S := $(shell uname -s)
 
-ifneq ($(UNAME_S),Darwin)
+# MPI examples only get compiled on Linux for right now
+ifeq ($(UNAME_S),Linux)
 EXES += hello_world_MPI.out hello_world_MPI2.out
 endif
 
