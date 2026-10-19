@@ -50,6 +50,7 @@ void *thread1(void * arg) {
        temp_buf[j]=0.5*(temp[j-1]+temp[j+1]);
     }
     pthread_exit(0);
+    return NULL;
 }
 
 // copy element from temp_buf array to temp array
@@ -60,6 +61,7 @@ void *thread2(void * arg) {
        temp[j]=temp_buf[j];
     }
     pthread_exit(0);
+    return NULL;
 }
 
 void compute_temp(double * temp, int active_points, int num_iterations) {

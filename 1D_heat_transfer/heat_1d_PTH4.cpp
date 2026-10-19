@@ -77,6 +77,7 @@ void *thread_total(void * arg) {
         pthread_barrier_wait(&BARRIER);
     }
     pthread_exit(0);
+    return NULL;
 }
 
 
