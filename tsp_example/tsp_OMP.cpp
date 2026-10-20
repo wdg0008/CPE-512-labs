@@ -27,30 +27,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <time.h>
+#include <omp.h>
+
+#include "../ctimer_utils.h"
 
 #ifdef _WIN32
 #include "winrandcompat.h"
 #endif
 
-#include <omp.h>  // added
-
 using namespace std;
-
-struct timespec tv1{}, tv2{};
-
-#define TIMER_CLEAR \
-    do { tv1 = {}; tv2 = {}; } while (0)
-
-#define TIMER_START \
-    timespec_get(&tv1, TIME_UTC)
-
-#define TIMER_ELAPSED \
-    (difftime(tv2.tv_sec, tv1.tv_sec) + \
-     ((double)tv2.tv_nsec - (double)tv1.tv_nsec) / 1e9)
-
-#define TIMER_STOP \
-    timespec_get(&tv2, TIME_UTC)
 
 #define MX_CITIES 30       // maximum number of cities in tour
 #define SEED (long) 178937 // random number seed

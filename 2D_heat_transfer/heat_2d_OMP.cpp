@@ -17,16 +17,12 @@ To execute on the Jetson Cluster
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
-#include <sys/time.h>
 #include <omp.h>
 #include <memory>
-using namespace std;
 
-#define TIMER_CLEAR  (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   (double) (tv2.tv_usec- tv1.tv_usec)/1000000.0+(tv2.tv_sec-tv1.tv_sec)
-#define TIMER_STOP      gettimeofday(&tv2, (struct timezone*)0)
-struct timeval tv1,tv2;
+#include "../ctimer_utils.h"
+
+using namespace std;
 
 template <typename T>
 class MatrixView {
