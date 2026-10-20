@@ -23,18 +23,30 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
+#include <pthread.h>
 #include <memory>
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 
+#ifdef _WIN32
+#include "winrandcompat.h"
+#endif
 using namespace std;
 
-#define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   (double) (tv2.tv_usec-tv1.tv_usec)/1000000.0+(tv2.tv_sec-tv1.tv_sec)
-#define TIMER_STOP      {gettimeofday(&tv2, (struct timezone*)0);timersub(&tv2,&tv1,&tv3);}
-struct timeval tv1,tv2,tv3;
+struct timespec tv1{}, tv2{};
+
+#define TIMER_CLEAR \
+    do { tv1 = {}; tv2 = {}; } while (0)
+
+#define TIMER_START \
+    timespec_get(&tv1, TIME_UTC)
+
+#define TIMER_ELAPSED \
+    (difftime(tv2.tv_sec, tv1.tv_sec) + \
+     ((double)tv2.tv_nsec - (double)tv1.tv_nsec) / 1e9)
+
+#define TIMER_STOP \
+    timespec_get(&tv2, TIME_UTC)
 
 #define MX_CITIES 30       // maximum number of cities in tour
 #define SEED (long) 178937 // random number seed

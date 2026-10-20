@@ -15,10 +15,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
-#include <string.h>
 #include <time.h>
-#include <sys/time.h>
 
 #ifdef _WIN32
 #include "winrandcompat.h"
