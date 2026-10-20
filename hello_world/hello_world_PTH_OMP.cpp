@@ -32,21 +32,41 @@ Note2: two while(1) infinite loop statements are comment out. If they are
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h> // needed for pthreads
-//#include <omp.h>     // needed if OpenMP API is used
+#include <cstdint>
+#include <omp.h>     // needed if OpenMP API is used
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#ifdef _WIN32
+#include <windows.h>
+#elif defined(__APPLE__)
+// pthreads is already included
+#elif defined(__linux__)
 #include <sys/syscall.h>
+#include <unistd.h>
+#endif
 
 using namespace std;
 
 pthread_mutex_t MUTEX; // globaly defined lock variable used to insure
                        // uninterrupted print operations from each thread
 
+uint64_t getNativeThreadId(void) {
+#ifdef _WIN32
+   return static_cast<uint64_t>(GetCurrentThreadId());
+#elif defined(__APPLE__)
+   uint64_t tid = 0;
+   return (pthread_threadid_np(nullptr, &tid) != 0) ? 0 : tid;
+#elif defined(__linux__)
+   return static_cast<uint64_t>(syscall(SYS_gettid));
+#endif
+}
+
 // This is the worker thread code
 void *hello(void * arg) {
    int myid=*(int *) arg;
-   pid_t ostid = syscall(SYS_gettid);
+   long ostid = getNativeThreadId();
 
    // enter critical region
    pthread_mutex_lock(&MUTEX);
@@ -66,7 +86,7 @@ int main(int argc,char *argv[])
    int tid;                       // tid thread id number
    int errcode;                   // pthread error code
 
-   pid_t ostid = syscall(SYS_gettid); //gettid();
+   long ostid = getNativeThreadId(); //gettid();
    cout << endl;
    cout << "Hello World from OSthread = " << ostid << endl << flush; 
    // get total number of threads to be launched
@@ -110,8 +130,6 @@ int main(int argc,char *argv[])
       }
    }
 
-/* // Uncomment to incorporate the OpenMP component after
-   // the ptheads threads have been generated
 
    // Fork a team of threads giving them their own
    // copy of private variable, tid, thread id
@@ -120,7 +138,7 @@ int main(int argc,char *argv[])
    {
       int tid; // private (local) variable thread id, tid
                // declared within the basic block
-      pid_t ostid = syscall(SYS_gettid); //gettid();
+      long ostid = getNativeThreadId(); //gettid();
       // Obtain thread number
       tid = omp_get_thread_num();
 
@@ -145,7 +163,7 @@ int main(int argc,char *argv[])
       }
       // while(1); // Infinite loop
    }  // All OMP threads join master thread and disband
-*/
+
    // wait for all pthreads to return before exiting main thread 
    for (tid=0; tid<nthreads; tid++) {
       // wait for each thread to terminate 

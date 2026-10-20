@@ -9,17 +9,11 @@
 #include <iostream>
 #include <iomanip>
 #include <string.h>
-#include <sys/time.h>
 #include <pthread.h>
 
-using namespace std;
+#include "../ctimer_utils.h"
 
-/* copied from mpbench */
-#define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   (double) (tv2.tv_usec-tv1.tv_usec)/1000000.0+(tv2.tv_sec-tv1.tv_sec)
-#define TIMER_STOP      gettimeofday(&tv2, (struct timezone*)0)
-struct timeval tv1,tv2;
+using namespace std;
 
 #define LEFT_TEMP 100  // temperature at lower/left boundary
 #define RIGHT_TEMP -40 // temperature at upper/right boundary
@@ -48,6 +42,7 @@ void *thread1(void * arg) {
     int j=*(int *) arg;
     temp_buf[j]=0.5*(temp[j-1]+temp[j+1]);
     pthread_exit(0);
+    return NULL;
 }
 
 // copy element from temp_buf array to temp array
@@ -55,6 +50,7 @@ void *thread2(void * arg) {
     int j=*(int *) arg;
     temp[j]=temp_buf[j];
     pthread_exit(0);
+    return NULL;
 }
 
 void compute_temp(double * temp, int active_points, int num_iterations) {

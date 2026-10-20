@@ -6,13 +6,7 @@
 
 
 EXES := hello_world.out hello_world_OMP.out hello_world_PTH.out \
-		hello_world_PTH_OMP.out prime.out
-
-UNAME_S := $(shell uname -s)
-
-ifneq ($(UNAME_S),Darwin)
-EXES += hello_world_MPI.out hello_world_MPI2.out
-endif
+		hello_world_PTH_OMP.out prime.out hello_world_MPI.out
 
 # compile everything by default
 all: $(EXES)
@@ -21,11 +15,9 @@ hello_world.out: hello_world.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 hello_world_MPI.out: hello_world_MPI.cpp
+ifeq ($(HOST_OS),Linux)
 	module load openmpi
-	mpic++ $< -o $@
-
-hello_world_MPI2.out: hello_world_MPI2.cpp
-	module load mpich
+endif
 	mpic++ $< -o $@
 
 hello_world_OMP.out: hello_world_OMP.cpp

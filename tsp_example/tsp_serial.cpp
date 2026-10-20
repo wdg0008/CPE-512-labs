@@ -2,11 +2,11 @@
 // B. Earl Wells -- September 2024
 //
 // Travelling Salesman Problem: "Given a specified number of "cities"
-// along with the cost of travel between each pair of them, find the 
-// cheapest way of visiting all the cities and returning to the first 
+// along with the cost of travel between each pair of them, find the
+// cheapest way of visiting all the cities and returning to the first
 // city visited."
 //
-// For an n city tour this program examines all (n-1)! tours and 
+// For an n city tour this program examines all (n-1)! tours and
 // returns a tour with the least travel cost.
 //
 // compilation:
@@ -15,17 +15,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
-#include <string.h>
-#include <sys/time.h>
+
+#include "../ctimer_utils.h"
+
+#ifdef _WIN32
+#include "winrandcompat.h"
+#endif
 
 using namespace std;
-
-#define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   (double) (tv2.tv_usec-tv1.tv_usec)/1000000.0+(tv2.tv_sec-tv1.tv_sec)
-#define TIMER_STOP      {gettimeofday(&tv2, (struct timezone*)0);timersub(&tv2,&tv1,&tv3);}
-struct timeval tv1,tv2,tv3;
 
 #define MX_CITIES 30       // maximum number of cities in tour
 #define SEED (long) 178937 // random number seed
@@ -33,7 +30,7 @@ struct timeval tv1,tv2,tv3;
 
 // generate randomly a cost matrix that represents the cost of travel
 // between each two cities. This generates a nonsymetric cost matrix
-// which means the cost of travel between any two cities may be 
+// which means the cost of travel between any two cities may be
 // depend on which city is the source and which is the destination
 void fill_cost_matrix(int cost_matrix[][MX_CITIES],int num_cities) {
    int i,j;
@@ -54,12 +51,12 @@ void fill_cost_matrix(int cost_matrix[][MX_CITIES],int num_cities) {
 }
 
 // This routine outputs to the screen the city cost matrix that has
-// been generated 
+// been generated
 void print_cost_matrix(int cost_matrix[][MX_CITIES],int num_cities) {
    int i,j;
    for (i=0;i<num_cities;i++) {
       for (j=0;j<num_cities;j++) {
-         printf("%03d ",cost_matrix[i][j]); 
+         printf("%03d ",cost_matrix[i][j]);
       }
       printf("\n");
    }
@@ -75,11 +72,11 @@ void print_city_visit_order(int city_order[],int num_cities) {
    for (int city=0;city<num_cities;city++) {
       cout <<"[City " << city_order[city] << "]->";
    }
-   cout << "[City " << city_order[0] << "]" << endl; 
+   cout << "[City " << city_order[0] << "]" << endl;
 }
 
 // routine that computes the cost of each tour where the tour is
-// described in the city_order array that should have a valid 
+// described in the city_order array that should have a valid
 // city order premutation of the n-1 remaining cities after the
 // first city, City 0, is assumed as the starting point. The
 // tour starts at City 0 and goes to the first city in the city_order
@@ -105,7 +102,7 @@ int tour_cost(int num_cities,int *city_order,
 }
 
 // Routine to save the current city_order permutation to another
-// data structure so that it can be displayed later by the 
+// data structure so that it can be displayed later by the
 // print_city_visit_order routine
 void save_order (int *city_order_sv,int num_cities,
                  int * city_order) {
@@ -122,8 +119,8 @@ int get_number_cities(int argc,char *argv[]) {
       num_cities = atoi(argv[1]);
    }
    else {
-      if (argc==1) { 
-         // input number of cities 
+      if (argc==1) {
+         // input number of cities
          cout << "Enter number of cities:" << endl;
          scanf("%d",&num_cities);
          cout << endl;
@@ -164,22 +161,22 @@ void city_tours_gen(int city_order_slot, int city_visit_order[],bool city_msk[],
         int cum_tour_cost) {
    // If there are more city slots available, then city visit order permutation
    // is not complete. Systematically select from remaining index elements the
-   // city that should occupy the current visit slot and call this routine 
+   // city that should occupy the current visit slot and call this routine
    // in a recursive manner.
    int prev_city = city_visit_order[city_order_slot-1];
    if (city_order_slot<num_cities) {
       int city=0;
       // search for unvisited city
-      while ((city=next_city(city,city_msk,num_cities)) >=0 ) { 
-         
+      while ((city=next_city(city,city_msk,num_cities)) >=0 ) {
+
          // for each city that has not become a part of a city visit
          // order yet, place it next in the city visit order schedule
-         // matrix         
+         // matrix
          city_visit_order[city_order_slot]=city;
 
          // then add in the cost from the previous city to this city
          // to the total tour cost so far (up to this level) of the city
-         // tour recursion tree 
+         // tour recursion tree
          int city_tour_cost = cum_tour_cost+city_cost_matrix[prev_city][city];
 
          city_msk[city]=true;   // mask out this number so it cannot
@@ -189,9 +186,9 @@ void city_tours_gen(int city_order_slot, int city_visit_order[],bool city_msk[],
          // city_order_slot being incremented by 1, and passing on the
          // current state of the city_msk[] arry, and the city_tour_cost
          // when this city is added to the tour.
-         // Note that the first arguments is used to point to where the 
+         // Note that the first arguments is used to point to where the
          // routine again with the slot number being where the next city
-         // will be placed in the city visit order permutation 
+         // will be placed in the city visit order permutation
          city_tours_gen(city_order_slot+1,city_visit_order,
             city_msk, city_tour_cost);
 
@@ -206,7 +203,7 @@ void city_tours_gen(int city_order_slot, int city_visit_order[],bool city_msk[],
       // cost and save the tour if it is better than the the best
       // tour so far
 
-      // add loop back path back to City in slot 0 (City 0)  
+      // add loop back path back to City in slot 0 (City 0)
       cum_tour_cost += city_cost_matrix[prev_city][0];
       if (cum_tour_cost<best_cost) {
          save_order (best_city_visit_order,num_cities,city_visit_order);
@@ -224,19 +221,19 @@ void tour_search(void) {
    bool city_msk[MX_CITIES];
 
    // clear out city mask array except for
-   // except for City 0 
+   // except for City 0
    for (int city=1;city<num_cities;city++) {
       city_msk[city]=false;
    }
-   // set city mask for City 0 
+   // set city mask for City 0
    // so it is not a selection candidate
    city_msk[0]=true;
 
    // place City 0 in the start of the city_visit_order (slot 0)
    city_visit_order[0]=0;
-  
-   // explore all possible (n-1)! city visit orders by calling this 
-   // recursive routine 
+
+   // explore all possible (n-1)! city visit orders by calling this
+   // recursive routine
    city_tours_gen(1,city_visit_order,city_msk,0);
 
 }
@@ -248,11 +245,11 @@ int main(int argc, char *argv[]) {
 
    // fill city cost matrix
    fill_cost_matrix(city_cost_matrix,num_cities);
-   
+
    // print city cost matrix
    cout << endl <<
       "____________________________________________________________________"
-     << endl; 
+     << endl;
    cout << "Number of Cities = " << num_cities <<
       endl << endl;
    cout << "Tour Cost Matrix" << endl;
@@ -260,7 +257,7 @@ int main(int argc, char *argv[]) {
 
    // start timer
    TIMER_CLEAR;
-   TIMER_START; 
+   TIMER_START;
 
    // search through all possible orderings of the
    // cities
@@ -270,15 +267,13 @@ int main(int argc, char *argv[]) {
    TIMER_STOP;
 
 
-   // print best city tour 
-   cout << "Best City Tour:" << endl; 
+   // print best city tour
+   cout << "Best City Tour:" << endl;
    print_city_visit_order(best_city_visit_order,num_cities);
 
-   cout << "Best Tour Cost = " <<  
+   cout << "Best Tour Cost = " <<
       tour_cost(num_cities,best_city_visit_order,city_cost_matrix)
-      << endl; 
+      << endl;
    cout <<"Execution Time = " << TIMER_ELAPSED << " seconds" << endl;
-    
-}
 
-   
+}

@@ -25,23 +25,20 @@
 // compilation:
 // g++ tsp_PTH2.cpp -o tsp_PTH2 -lpthread -Ofast
 //
-// #include <memory>
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <iomanip>
 #include <string.h>
-#include <sys/time.h>
 #include <pthread.h>
 #include <memory>
 
-using namespace std;
+#include "../ctimer_utils.h"
 
-#define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   (double) (tv2.tv_usec-tv1.tv_usec)/1000000.0+(tv2.tv_sec-tv1.tv_sec)
-#define TIMER_STOP      {gettimeofday(&tv2, (struct timezone*)0);timersub(&tv2,&tv1,&tv3);}
-struct timeval tv1,tv2,tv3;
+#ifdef _WIN32
+#include "winrandcompat.h"
+#endif
+
+using namespace std;
 
 #define MX_CITIES 30       // maximum number of cities in tour
 #define SEED (long) 178937 // random number seed
