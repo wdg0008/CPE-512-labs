@@ -1,3 +1,6 @@
+#!/usr/bin/env make
+# shebang allows direct execution with chmod +x (very cursed)
+
 # Specify target when none is provided
 .DEFAULT_GOAL := all
 

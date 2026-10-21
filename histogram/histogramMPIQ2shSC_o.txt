@@ -1,0 +1,164 @@
+setting asax scratch directory
+ 
+============================================================
+=====         Summary of your script job               =====
+============================================================
+  The script file is: histogram_MPI_Q2.sh
+  The time limit is 1:00:00 HH:MM:SS.
+  The target directory is: /home/uahclsf0079/histogram
+  The working directory is:  /scratch-local/uahclsf0079.histogramMPIQ2shSC.105955.asax-pbs1
+  The memory limit is: 500mb
+  The job will start running after: 202610211212.52
+  Job Name: histogramMPIQ2shSC
+  Queue: -q class -W group_list=classq
+  Constraints: 
+  Using  5  cores on master node  asax020.asc.edu
+  Node list:  asax020.asc.edu asax020.asc.edu asax020.asc.edu asax020.asc.edu asax020.asc.edu
+  Cores:  5
+  Command typed:
+/scripts/run_script_mpi histogram_MPI_Q2.sh     
+  Queue submit command:
+qsub -q class -W group_list=classq -j oe -N histogramMPIQ2shSC -a 202610211212.52 -r n -M wdg0008@uah.edu -m n -l walltime=1:00:00 -l select=5:mpiprocs=1:mem=100mb 
+ 
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   asax020
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+65.3199
+59.4654
+67.4599
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  9
+87.5  1
+1 MPI Process OpenMPI Implementation
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   asax020
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+65.3199
+59.4654
+67.4599
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  9
+87.5  1
+2 MPI Process OpenMPI Implementation
+[asax020:862576] 1 more process has sent help message help-mpi-btl-openib.txt / error in device init
+[asax020:862576] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   asax020
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+65.3199
+59.4654
+67.4599
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  9
+87.5  1
+4 MPI Process OpenMPI Implementation
+[asax020:862598] 3 more processes have sent help message help-mpi-btl-openib.txt / error in device init
+[asax020:862598] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+WARNING: There was an error initializing an OpenFabrics device.
+
+  Local host:   asax020
+  Local device: mlx5_0
+--------------------------------------------------------------------------
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+65.3199
+59.4654
+67.4599
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  9
+87.5  1
+5 MPI Process OpenMPI Implementation
+[asax020:862627] 4 more processes have sent help message help-mpi-btl-openib.txt / error in device init
+[asax020:862627] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages

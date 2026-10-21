@@ -1,5 +1,9 @@
+#!/usr/bin/env make
+
 CXXFLAGS += -O3 -ffast-math
 # add -march=native if you are brave and want optimizations
+
+.PHONY: all clean
 
 all: tsp_serial.out tsp_PTH1.out tsp_PTH2.out tsp_OMP.out
 
@@ -15,6 +19,5 @@ tsp_PTH2.out: tsp_PTH2.cpp
 tsp_OMP.out: tsp_OMP.cpp
 	$(CXX) $(CXXFLAGS) $(OMP_CXXFLAGS) $^ -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
-.PHONY: clean
 clean:
 	rm -f *.i* *.o*

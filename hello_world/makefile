@@ -1,9 +1,10 @@
-#!/usr/bin/make -f
+#!/usr/bin/env make
 
 # Special directive so all recipe lines for one target run in the same shell
 # preserves environment modifications from loading modules within a target
 .ONESHELL:
 
+.PHONY: all clean
 
 EXES := hello_world.out hello_world_OMP.out hello_world_PTH.out \
 		hello_world_PTH_OMP.out prime.out hello_world_MPI.out
@@ -44,6 +45,5 @@ hello_world_PTH_OMP.out: hello_world_PTH_OMP.cpp
 prime.out: prime.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
-.PHONY: clean
 clean:
 	rm -f *.i* *.o*

@@ -1,3 +1,7 @@
+#!/usr/bin/env make
+
+.PHONY: all clean
+
 EXES := heat_1d_serial.out heat_1d_PTH1.out heat_1d_PTH2.out heat_1d_PTH3.out heat_1d_PTH4.out heat_1d_PTH5.out
 
 all: $(EXES)
@@ -22,6 +26,5 @@ heat_1d_PTH4.out: heat_1d_PTH4.cpp
 heat_1d_PTH5.out: heat_1d_PTH5.cpp
 	$(CXX) $(CPPFLAGS) $(PTHREAD_CPPFLAGS) $(CXXFLAGS) -o $@ $^ $(PTHREAD_LDFLAGS) $(PTHREAD_LIBS)
 
-.PHONY: clean
 clean:
 	rm -f $(EXES) *.txt *.i* *.o*
