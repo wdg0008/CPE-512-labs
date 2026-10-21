@@ -41,7 +41,6 @@ To execute:
 
 */  
 
-using namespace std;
 #include <iostream>
 #include <iomanip>
 #include <sstream>
@@ -49,6 +48,8 @@ using namespace std;
 #include <random>
 #include <exception>
 #include <mpi.h> /* MPI Prototype Header Files */
+
+using namespace std;
 
 /*
 ONE-TO-ALL BROADCAST COMMUNICATION ROUTINE

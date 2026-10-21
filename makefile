@@ -28,6 +28,8 @@ LDFLAGS  ?=
 LDLIBS   ?=
 # Temporary placeholder until this is used a lot more in the course.
 MPICXX ?= mpic++
+# Build MPICH-dependent targets only when invoked with ASAX=1.
+ASAX ?= 0
 
 # Export configuration to child Make processes.
 export CXX CPPFLAGS CXXFLAGS LDFLAGS LDLIBS
@@ -35,9 +37,10 @@ export OMP_CXXFLAGS OMP_LDFLAGS OMP_LIBS
 export PTHREAD_CPPFLAGS PTHREAD_CXXFLAGS PTHREAD_LDFLAGS PTHREAD_LIBS
 export MPICXX
 export HOST_OS
+export ASAX
 
 # Subdirectories containing course units.
-UNITS := 1D_heat_transfer 2D_heat_transfer hello_world tsp_example
+UNITS := 1D_heat_transfer 2D_heat_transfer hello_world tsp_example histogram
 
 # each of these are phony targets, so make will always run the recipe
 .PHONY: all clean $(UNITS)

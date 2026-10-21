@@ -28,13 +28,14 @@ To execute:
 
 */  
 
-using namespace std;
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <stdlib.h>
 #include <random>
 #include <exception>
+
+using namespace std;
 
 /*
 Function used by get_parameters routine to prompt the user to 
