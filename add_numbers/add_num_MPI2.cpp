@@ -1,36 +1,35 @@
-wellsbe@picocluster:/shared/wells_class/MPI_add_numbers$ cat add_num_MPI2.cpp
 /***************************************************************/
 /* Summation of a Sequence of Numbers Program -- MPI version   */
 /* September 2026 -- B. Earl Wells -- University of Alabama    */
 /*                                    in Huntsville            */
 /***************************************************************/
 /*
-This program illustrates the basic concepts of SPMD programming using 
-MPI.  The program represents a common example that is used often in 
+This program illustrates the basic concepts of SPMD programming using
+MPI.  The program represents a common example that is used often in
 the CPE 412/512 text, the distributed addition of a sequence of numbers.
 The program is written in such a way that it is assumed that the
 sequence of numbers is first read from a central source (in this case
-a data file) by a single MPI process (the root process) and then 
-partitioned into equal groups with each part being distributed 
+a data file) by a single MPI process (the root process) and then
+partitioned into equal groups with each part being distributed
 (scattered) to the local memory domains of the other MPI
-processes in the system. After which each process computes its own 
+processes in the system. After which each process computes its own
 partial sum of the data that is in its domain and then sends this
 value to the memory domain of the root process which then
 adds the partial sums together (reduce operation) and then
 outputs this sum to the screen.
 
 The following is a simplified version of the program which you will
-be asked to augment in a number of ways in future homework 
+be asked to augment in a number of ways in future homework
 assignments. Use the asax.asc.edu or the UAH Picocluster system.
 Notes: This implementation utilizes a minimum set of MPI methods
        call that include Init, Finalize, Comm_size,
        Comm_rank, Send, and Recv.
        Abort is also used to illustrate its functionality.
 
-Before compiling on the asax.asc.edu system, first load openmpi  module 
+Before compiling on the asax.asc.edu system, first load openmpi  module
    module load openmpi
 
-To compile  
+To compile
    mpic++ add_num_MPI2.cpp -o add_num_MPI2
 
 To execute:
@@ -44,14 +43,15 @@ To execute:
                               # numbers you want to add
 
 
-*/  
+*/
 
-using namespace std;
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <stdlib.h>
 #include <mpi.h> /* MPI Prototype Header Files */
+
+using namespace std;
 
 #define SEED 2397            /* random number seed */
 #define MAX_VALUE   100.0    /* maximum value of any number in list */
@@ -71,7 +71,7 @@ void broadcast_int(int *int_num,int root, int rank, int numtasks) {
    if (rank==root) {
       for(int mpitask=0;mpitask<numtasks;mpitask++) {
          if (mpitask!=root) {
-            MPI::COMM_WORLD.Send(int_num,1,MPI::INT, 
+            MPI::COMM_WORLD.Send(int_num,1,MPI::INT,
                   mpitask,type);
          }
       }
@@ -87,8 +87,8 @@ void broadcast_int(int *int_num,int root, int rank, int numtasks) {
 }
 
 /*
-Routine to retrieve the data size of the numbers array from the 
-command line or get this number by prompting the user for the 
+Routine to retrieve the data size of the numbers array from the
+command line or get this number by prompting the user for the
 information.  Note: command line values are sent to ALL MPI processes
 by the MPI environment.
 */
@@ -102,7 +102,7 @@ int get_data_size(int argc,char *argv[],int rank,int numtasks)
       if (rank==0)
          cout << "usage:  mpirun -np [num MPI tasks] add_num_MPI [data size]" << endl;
       MPI_Finalize(); // Terminate MPI
-      exit(1); // Exit Program 
+      exit(1); // Exit Program
    }
    // One Command Line Argument Case:
    // case where user did not enter number of numbers on command line
@@ -118,7 +118,7 @@ int get_data_size(int argc,char *argv[],int rank,int numtasks)
             if (myStream >> size) break;
             cout << "Invalid Input" << endl << endl;
          }
-      }     
+      }
       // since only the root MPI process is communicating with the
       // user, the root process must send its value to all of the
       // other MPI process. It can do this with the broadcast_int()
@@ -139,7 +139,7 @@ int get_data_size(int argc,char *argv[],int rank,int numtasks)
 /*
 Routine that fills the number matrix with Random Data with values
 between MIN_VALUE and MAX_VALUE
-This simulates in some way what might happen if there was a 
+This simulates in some way what might happen if there was a
 single sequential data acquisition source such as a single file
 */
 void fill_matrix(double *numbers,int data_size)
@@ -156,7 +156,7 @@ void fill_matrix(double *numbers,int data_size)
 }
 
 /*
-Routine that outputs the numbers matrix to the screen 
+Routine that outputs the numbers matrix to the screen
 */
 void print_matrix(double *numbers,int data_size)
 {
@@ -170,7 +170,7 @@ void print_matrix(double *numbers,int data_size)
 /* ONE-TO-ALL SCATTER ROUTINE
 Routine to divide and scatter the number data array that resides on the
 root MPI process to all other MPI processes in the system.
-The number data size is given by the'num_size' parameter its source 
+The number data size is given by the'num_size' parameter its source
 address is given by the '*numbers' parameter, and the destination
 group data associated with the current process is given by the
 '*group' parameter.  */
@@ -178,9 +178,9 @@ void scatter(double *numbers,double *group,int num_size, int root, int rank,int 
 {
    MPI::Status status;
    int type = 234;
-   
+
    // determine number of elements in subarray groups to be processed by
-   // each MPI process assuming a perfectly even distribution of elements 
+   // each MPI process assuming a perfectly even distribution of elements
    int number_elements_per_section = num_size/numtasks;
 
    // if root MPI process send portion of numbers array to each of the
@@ -190,11 +190,11 @@ void scatter(double *numbers,double *group,int num_size, int root, int rank,int 
       int begin_element=0;
 
       for(int mpitask=0;mpitask<numtasks;mpitask++) {
-      
+
          // in MPI root process case just copy the appropriate subsection
          // locally from the numbers array over to the group array
          if (mpitask==root) {
-            for (int i=0;i<number_elements_per_section;i++) 
+            for (int i=0;i<number_elements_per_section;i++)
                group[i]=numbers[i+begin_element];
          }
          // if not the root process send the subsection data to
@@ -211,13 +211,13 @@ void scatter(double *numbers,double *group,int num_size, int root, int rank,int 
    // if a non root process just receive the data
    else {
       MPI::COMM_WORLD.Recv(group,number_elements_per_section,MPI::DOUBLE,
-               root,type,status);  
+               root,type,status);
    }
 }
 /*
 ALL-TO-ONE Reduce ROUTINE
 Routine to accumulate the result of the local summation associated
-with each MPI process. This routine takes these partial sums and 
+with each MPI process. This routine takes these partial sums and
 produces a global sum on the root MPI process (0)
 Input arguments to routine include variable name of local partial
 sum of each MPI process. The function returns to MPI root process 0,
@@ -235,12 +235,12 @@ void reduce(double *sum, double *partial_sum,int root, int rank,int numtasks)
             MPI::COMM_WORLD.Recv(partial_sum,1,MPI::DOUBLE,
             mpitask,type,status);
             (*sum) += (*partial_sum);
-         } 
+         }
       }
    }
-   // if not root MPI root process then send partial sum to the root  
+   // if not root MPI root process then send partial sum to the root
    else {
-      MPI::COMM_WORLD.Send(partial_sum,1, MPI::DOUBLE, 
+      MPI::COMM_WORLD.Send(partial_sum,1, MPI::DOUBLE,
          root, type);
    }
 }
@@ -269,12 +269,12 @@ int main( int argc, char *argv[])
    if(rank==0) {
 
       // dynamically allocate from heap the numbers array on the root process
-      // Similar to the g++ extention which allows run time declarations 
+      // Similar to the g++ extention which allows run time declarations
       // double numbers[data_size];
-      // but this is not standard C++ : new operator is used instead 
+      // but this is not standard C++ : new operator is used instead
       numbers = new (nothrow) double[data_size];
       if (numbers==0) { // check for null pointer
-         cout << "Memory Allocation Error on Root for numbers array" 
+         cout << "Memory Allocation Error on Root for numbers array"
               << endl << flush;
          MPI::COMM_WORLD.Abort(1); // abort the MPI Environment
       }
@@ -283,7 +283,7 @@ int main( int argc, char *argv[])
       fill_matrix(numbers,data_size);
 
       // and print the numbers matrix
-      cout << "numbers matrix =" << endl; 
+      cout << "numbers matrix =" << endl;
       print_matrix(numbers,data_size);
       cout << endl;
    }
@@ -291,22 +291,22 @@ int main( int argc, char *argv[])
    // dynamically allocate from heap the group array that will hold
    // the partial set of numbers for each MPI process
    // The official way of using the heap to declare a variable size array
-   // Similar to the g++ extention which allows run time declarations 
+   // Similar to the g++ extention which allows run time declarations
    // double group[data_size/numtasks+1];
-   // but this is not standard C++ : new operator is used instead 
+   // but this is not standard C++ : new operator is used instead
    group = new (nothrow) double[data_size/numtasks+1];
    if (group==0) { // check for null pointer to group
       cout << "Memory Allocation Error" << endl << flush;
       MPI::COMM_WORLD.Abort(1); // abort the MPI Environment
    }
- 
+
    // scatter the numbers matrix to all processing elements in
    // the system
    scatter(numbers,group,data_size,0,rank,numtasks);
 
    // sum up elements in the group associated with the
    // current process
-   num_group = data_size/numtasks; // determine local list size 
+   num_group = data_size/numtasks; // determine local list size
                                    // group
    pt_sum =0;                      // clear out partial sum
    for (i=0;i<num_group;i++) pt_sum += group[i];

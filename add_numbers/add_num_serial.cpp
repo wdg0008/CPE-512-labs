@@ -7,19 +7,20 @@
 
 To compile type:
 
-   g++ add_num_serial.cpp -o add_num_serial 
+   g++ add_num_serial.cpp -o add_num_serial
 
 To execute:
-   add_num [num of numbers] 
+   add_num [num of nums]
 
-*/  
+*/
 
-using namespace std;
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <stdlib.h>
 #include <sys/time.h>
+
+using namespace std;
 
 #define SEED 2397           /* random number seed */
 #define MAX_VALUE  100.0    /* maximum value of any number in list */
@@ -33,9 +34,9 @@ using namespace std;
 struct timeval tv1,tv2;
 
 /*
-Routine to retrieve the data size of the numbers array from the 
-command line or get this number by prompting the user for the 
-information. 
+Routine to retrieve the data size of the nums array from the
+command line or get this number by prompting the user for the
+information.
 */
 int get_data_size(int argc,char *argv[])
 {
@@ -45,13 +46,13 @@ int get_data_size(int argc,char *argv[])
    // ERROR if too many command line arguments
    if(argc > 2) {
       cout << "usage:  add_num [data size]" << endl;
-      exit(1); // Exit Program 
+      exit(1); // Exit Program
    }
    // One Command Line Argument Case:
-   // case where user did not enter number of numbers on command line
+   // case where user did not enter number of nums on command line
    if (argc==1) {
       while (1) {
-         cout << "Enter the number of numbers to be added:" << endl;
+         cout << "Enter the number of nums to be added:" << endl;
          getline(cin, input);
          stringstream myStream(input);
          if (myStream >> size) break;
@@ -59,7 +60,7 @@ int get_data_size(int argc,char *argv[])
       }
    }
    // Two Command Line Argument case:
-   // user supplied the number of numbers on the command line.
+   // user supplied the number of nums on the command line.
    else {
       size = atoi(argv[1]);
    }
@@ -69,40 +70,40 @@ int get_data_size(int argc,char *argv[])
 /*
 Routine that fills the number matrix with Random Data with values
 between MIN_VALUE and MAX_VALUE
-This simulates in some way what might happen if there was a 
+This simulates in some way what might happen if there was a
 single sequential data acquisition source such as a single file
 */
-void fill_matrix(double *numbers,int data_size)
+void fill_matrix(double *nums,int data_size)
 {
    int i;
    srand48(SEED);
    for(i=0;i<data_size;i++) {
-      numbers[i]=drand48()*(MAX_VALUE-MIN_VALUE) + MIN_VALUE;
-      //to verify may want to initialize the numbers array with a pattern
-      //that has a known answer such as the sum of numbers from 0 to N-1
+      nums[i]=drand48()*(MAX_VALUE-MIN_VALUE) + MIN_VALUE;
+      //to verify may want to initialize the nums array with a pattern
+      //that has a known answer such as the sum of nums from 0 to N-1
       // The result of that summation is (N+1)*N/2!!
-      numbers[i]=i; // to do so uncomment this line
+      nums[i]=i; // to do so uncomment this line
    }
 }
 
 /*
-Routine that outputs the numbers matrix to the screen 
+Routine that outputs the nums matrix to the screen
 */
-void print_matrix(double *numbers,int data_size)
+void print_matrix(double *nums,int data_size)
 {
    int i;
    for(i=0;i<data_size;i++) {
-      cout << numbers[i] << endl;
+      cout << nums[i] << endl;
    }
 }
 
 /*
-MAIN ROUTINE: summation of numbers in a list
+MAIN ROUTINE: summation of nums in a list
 */
 
 int main( int argc, char *argv[])
 {
-   double *numbers;
+   double *nums;
    double sum;
    int data_size,i;
 
@@ -110,19 +111,19 @@ int main( int argc, char *argv[])
    //the user for input
    data_size=get_data_size(argc,argv);
 
-   // dynamically allocate from heap the numbers array
-   numbers = new (nothrow) double[data_size];
-   if (numbers==0) { // check for null pointer
+   // dynamically allocate from heap the nums array
+   nums = new (nothrow) double[data_size];
+   if (nums==0) { // check for null pointer
       cout << "Memory Allocation Error" << endl;
       exit(1); // exit the program
    }
- 
-   // initialize numbers matrix with random data
-   fill_matrix(numbers,data_size);
 
-   // and print the numbers matrix
-   cout << "numbers matrix =" << endl; 
-//   print_matrix(numbers,data_size);
+   // initialize nums matrix with random data
+   fill_matrix(nums,data_size);
+
+   // and print the nums matrix
+   cout << "nums matrix =" << endl;
+//   print_matrix(nums,data_size);
    cout << endl;
 
    // start recording the execution time
@@ -131,17 +132,17 @@ int main( int argc, char *argv[])
    TIMER_CLEAR;
    TIMER_START;
 
-   // sum up elements in the numbers array
+   // sum up elements in the nums array
    sum =0;                      // clear out partial sum
-   for (i=0;i<data_size;i++) sum += numbers[i];
+   for (i=0;i<data_size;i++) sum += nums[i];
 
    // stop recording the execution time
    TIMER_STOP;
 
-   cout << "Sum of numbers is " << setprecision(8) << sum << endl;
-   cout << "time=" << setprecision(8) <<  TIMER_ELAPSED/1000000.0 
+   cout << "Sum of nums is " << setprecision(8) << sum << endl;
+   cout << "time=" << setprecision(8) <<  TIMER_ELAPSED/1000000.0
         << " seconds" << endl;
 
    // reclaim dynamiclly allocated memory
-   delete numbers;
+   delete nums;
 }

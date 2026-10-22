@@ -43,7 +43,8 @@ export HOST_OS
 export ASAX
 
 # Subdirectories containing course units.
-UNITS := 1D_heat_transfer 2D_heat_transfer hello_world tsp_example histogram
+UNITS := 1D_heat_transfer 2D_heat_transfer hello_world tsp_example \
+		 histogram add_numbers
 
 # each of these are phony targets, so make will always run the recipe
 .PHONY: all clean $(UNITS)

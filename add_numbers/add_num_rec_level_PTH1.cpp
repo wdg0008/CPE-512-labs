@@ -12,11 +12,10 @@ To compile type:
    g++ add_num_rec_level_PTH1.cpp -o add_num_rec_level_PTH1 -lpthread
 
 To execute:
-   add_num_rec_level_PTH1 [num of numbers] [level of recursion] 
+   add_num_rec_level_PTH1 [num of nums] [level of recursion]
 
-*/  
+*/
 
-using namespace std;
 #include <iostream>
 #include <iomanip>
 #include <stdio.h>
@@ -26,12 +25,14 @@ using namespace std;
 #include <pthread.h>
 #include <string.h>
 
+using namespace std;
+
 #define MAX_THREADS 64      /* Maximum Number of threads allowed */
 #define SEED 2397           /* random number seed */
 #define MAX_VALUE  100.0    /* maximum value of any number in list */
 #define MIN_VALUE  0.0      /* minimum value of any number in list */
 
-// timer macros  
+// timer macros
 #define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
 #define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
 #define TIMER_ELAPSED   ((tv2.tv_usec-tv1.tv_usec)+((tv2.tv_sec-tv1.tv_sec)*1000000))
@@ -39,9 +40,9 @@ using namespace std;
 struct timeval tv1,tv2;
 
 /*
-Routine to retrieve the data size of the numbers array from the 
-command line or get this number by prompting the user for the 
-information. 
+Routine to retrieve the data size of the nums array from the
+command line or get this number by prompting the user for the
+information.
 */
 void get_data_size_level(int argc,char *argv[],int *data_size,
                         int *level)
@@ -51,15 +52,15 @@ void get_data_size_level(int argc,char *argv[],int *data_size,
 
    // ERROR if too many command line arguments
    if(argc > 3 || argc==2) {
-      cout << "usage:  add_num_rec_level_PTH1 [data size] [level]" 
+      cout << "usage:  add_num_rec_level_PTH1 [data size] [level]"
            << endl;
-      exit(1); // Exit Program 
+      exit(1); // Exit Program
    }
    // One Command Line Argument Case:
-   // case where user did not enter number of numbers on command line
+   // case where user did not enter number of nums on command line
    if (argc==1) {
       while (1) {
-         cout << "Enter the number of numbers to be added:" << endl;
+         cout << "Enter the number of nums to be added:" << endl;
          getline(cin, input);
          stringstream myStream(input);
          if (myStream >> size) break;
@@ -76,7 +77,7 @@ void get_data_size_level(int argc,char *argv[],int *data_size,
       *level=lev;
    }
    // Three Command Line Argument case:
-   // user supplied the number of numbers on the command line.
+   // user supplied the number of nums on the command line.
    else {
       *data_size = atoi(argv[1]);
       *level = atoi(argv[2]);
@@ -86,34 +87,34 @@ void get_data_size_level(int argc,char *argv[],int *data_size,
 /*
 Routine that fills the number matrix with Random Data with values
 between MIN_VALUE and MAX_VALUE
-This simulates in some way what might happen if there was a 
+This simulates in some way what might happen if there was a
 single sequential data acquisition source such as a single file
 */
-void fill_matrix(double *numbers,int data_size)
+void fill_matrix(double *nums,int data_size)
 {
    int i;
    srand48(SEED);
    for(i=0;i<data_size;i++) {
-      numbers[i]=drand48()*(MAX_VALUE-MIN_VALUE) + MIN_VALUE;
-      //to verify may want to initialize the numbers array with a pattern
-      //that has a known answer such as the sum of numbers from 0 to N-1
+      nums[i]=drand48()*(MAX_VALUE-MIN_VALUE) + MIN_VALUE;
+      //to verify may want to initialize the nums array with a pattern
+      //that has a known answer such as the sum of nums from 0 to N-1
       // The result of that summation is (N+1)*N/2!!
-      numbers[i]=i; // to do so uncomment this line
+      nums[i]=i; // to do so uncomment this line
    }
 }
 
 /*
-Routine that outputs the numbers matrix to the screen 
+Routine that outputs the nums matrix to the screen
 */
-void print_matrix(double *numbers,int data_size)
+void print_matrix(double *nums,int data_size)
 {
    int i;
    for(i=0;i<data_size;i++) {
-      cout << numbers[i] << endl;
+      cout << nums[i] << endl;
    }
 }
 
-double *numbers, part_sum[MAX_THREADS];
+double *nums, part_sum[MAX_THREADS];
 int nthreads=0; // number of pthreads dynamically spawned
 // thread start and end indices
 int start_idx[MAX_THREADS],end_idx[MAX_THREADS];
@@ -126,27 +127,27 @@ void *add_local(void * arg) { // *hello(void * arg) {
    int start_index=start_idx[tid];
    int end_index=end_idx[tid];
 
-   // sum up remaining numbers
+   // sum up remaining nums
    double partial_sum = 0.0;
    for (int i = start_index;i<=end_index;i++) {
-         partial_sum += numbers[i];
+         partial_sum += nums[i];
    }
    part_sum[tid]=partial_sum;
    return arg;
 }
 // recursive function that returns the sum of the elements in the
 // list between the start_index value and the end_index
-// value. The numbers arry is considered to be global to the main 
-// program and each invocation of the add_numbers() function.
+// value. The nums arry is considered to be global to the main
+// program and each invocation of the add_nums() function.
 // the function recurses down to the specified level then the
-// remaining numbers in the list from start_index to end_index are
+// remaining nums in the list from start_index to end_index are
 // added serially
-int add_numbers(int start_index, int end_index,
+int add_nums(int start_index, int end_index,
                    int current_level, int end_level) {
    double partial_sum;
 
-   // if only one element return its value -- termination condition 
-   if (end_index==start_index) partial_sum=numbers[start_index];
+   // if only one element return its value -- termination condition
+   if (end_index==start_index) partial_sum=nums[start_index];
    else {
       cout << end_index << endl;
       if (current_level < end_level) {
@@ -154,10 +155,10 @@ int add_numbers(int start_index, int end_index,
          int middle_index = start_index + (end_index-start_index+1)/2 +
                          (end_index-start_index+1)%2 -1;
          // calculate first half of list
-         partial_sum =  add_numbers(start_index,middle_index,
+         partial_sum =  add_nums(start_index,middle_index,
                                     current_level+1,end_level);
          // calculate second half of list
-         partial_sum += add_numbers(middle_index+1,end_index,
+         partial_sum += add_nums(middle_index+1,end_index,
                                     current_level+1,end_level);
       }
       else {
@@ -167,24 +168,24 @@ int add_numbers(int start_index, int end_index,
             ids[nthreads]=nthreads;
             int errcode=pthread_create(
                &pthread_ids[nthreads],// thread information structure
-               NULL,         // thread attributes-NULL means assume defaults 
+               NULL,         // thread attributes-NULL means assume defaults
                add_local,   // function name that is to represent thread
-               &ids[nthreads]); // pthread created thread id forthe new thread        
+               &ids[nthreads]); // pthread created thread id forthe new thread
             // check for error during thread creation
             if (errcode) {
-               cerr << "Pthread Creation Error: " << strerror(errcode) 
-                  << endl; 
+               cerr << "Pthread Creation Error: " << strerror(errcode)
+                  << endl;
                exit(1);
             }
 	    nthreads++;
 	 }
       }
    }
-   return partial_sum;  
+   return partial_sum;
 }
 
 /*
-MAIN ROUTINE: summation of numbers in a list
+MAIN ROUTINE: summation of nums in a list
 */
 int main( int argc, char *argv[])
 {
@@ -194,19 +195,19 @@ int main( int argc, char *argv[])
    //the user for input
    get_data_size_level(argc,argv,&data_size,&end_level);
 
-   // dynamically allocate from heap the numbers array
-   numbers = new (nothrow) double[data_size];
-   if (numbers==0) { // check for null pointer
+   // dynamically allocate from heap the nums array
+   nums = new (nothrow) double[data_size];
+   if (nums==0) { // check for null pointer
       cout << "Memory Allocation Error" << endl;
       exit(1); // exit the program
    }
- 
-   // initialize numbers matrix with random data
-   fill_matrix(numbers,data_size);
 
-   // and print the numbers matrix
-   cout << "numbers matrix =" << endl; 
-   print_matrix(numbers,data_size);
+   // initialize nums matrix with random data
+   fill_matrix(nums,data_size);
+
+   // and print the nums matrix
+   cout << "nums matrix =" << endl;
+   print_matrix(nums,data_size);
    cout << endl;
 
 
@@ -215,19 +216,19 @@ int main( int argc, char *argv[])
    TIMER_CLEAR;
    TIMER_START;
 
-   // sum up elements in the numbers array
-   sum=add_numbers(0,data_size-1,0,end_level);
+   // sum up elements in the nums array
+   sum=add_nums(0,data_size-1,0,end_level);
 
    if (nthreads>0) {
       sum=0;
       // wait for all threads to return before exiting main program (process)
       for (int tid=0; tid<nthreads; tid++) {
-         // wait for each thread to terminate 
+         // wait for each thread to terminate
          int errcode=pthread_join(
               pthread_ids[tid], //pthread id information of selected thread
               NULL);        //thread return value -- not used in this case
          if (errcode) {
-            cerr << "Pthread Join Error: " << strerror(errcode) << endl; 
+            cerr << "Pthread Join Error: " << strerror(errcode) << endl;
             exit(1);
          }
          sum += part_sum[tid]; // add up each partial sum
@@ -238,13 +239,13 @@ int main( int argc, char *argv[])
    TIMER_STOP;
 
    cout << "Number of Threads generated was " << nthreads << endl;
-   cout << "Sum of numbers is " << setprecision(8) << sum << endl;
-   cout << "Reference Sum is " << 
+   cout << "Sum of nums is " << setprecision(8) << sum << endl;
+   cout << "Reference Sum is " <<
 	   data_size*(data_size-1)/2 << endl;
-   cout << "time=" << setprecision(8) <<  TIMER_ELAPSED/1000000.0 
+   cout << "time=" << setprecision(8) <<  TIMER_ELAPSED/1000000.0
         << " seconds" << endl;
 
    // reclaim dynamiclly allocated memory
-   delete numbers;
+   delete nums;
 }
 
