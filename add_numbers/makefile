@@ -29,7 +29,6 @@ endif
 add_num_rec_level_PTH1.out: add_num_rec_level_PTH1.cpp
 	$(CXX) $(CXXFLAGS) -pthread $< -o $@
 
-# use implicit make rules with $(CXX) $(CXXFLAGS)
 add_num_rec_level_serial.out: add_num_rec_level_serial.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 

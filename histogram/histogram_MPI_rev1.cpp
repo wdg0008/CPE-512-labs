@@ -93,7 +93,7 @@ T enter_next_param(const std::string prompt) {
       cout << prompt << endl;
       getline(cin, input);
       stringstream myStream(input);
-      if (myStream >> num) break;
+      if (myStream >> num) break; // feels evil, how does this even work?
       cout << "Invalid Input" << endl << endl;
    }
    return num;
@@ -201,7 +201,8 @@ void scatter(double *numbers,double *group,int num_size, int root, int rank,int 
    
    // determine number of elements in subarray groups to be processed by
    // each MPI process assuming a perfectly even distribution of elements 
-   const int number_elements_per_section = num_size/numprocs;
+   const int numel_ideal = num_size/numprocs;
+   const int numel_rem = num_size % numprocs; // not const, counts down to zero
 
    // if root MPI process send portion of numbers array to each of the
    // the other MPI processes as well as make a copy of the portion
@@ -210,26 +211,32 @@ void scatter(double *numbers,double *group,int num_size, int root, int rank,int 
       int begin_element=0;
 
       for(int mpiproc=0;mpiproc<numprocs;mpiproc++) {
+         // recompute for each process iterated over (remainder must run out)
+         int numel = numel_ideal + (mpiproc < numel_rem);
       
          // in MPI root process case just copy the appropriate subsection
          // locally from the numbers array over to the group array
          if (mpiproc==root) {
-            for (int i=0;i<number_elements_per_section;i++) 
+            for (int i=0;i<numel;i++) {
                group[i]=numbers[i+begin_element];
+            }
          }
          // if not the root process send the subsection data to
          // the next MPI process
          else {
-            MPI_Send(&numbers[begin_element],number_elements_per_section,
+            MPI_Send(&numbers[begin_element],numel,
                MPI_DOUBLE,mpiproc,tag,MPI_COMM_WORLD);
          }
          // point to next unsent or uncopied data in numbers array
-         begin_element += number_elements_per_section;
+         begin_element += numel;
       }
    }
    // if a non root process just receive the data
    else {
-      MPI_Recv(group,number_elements_per_section,MPI_DOUBLE,
+      // add an extra if ID less than remainder to ensure fair distribution
+      const int numel_proc = numel_ideal + (rank < numel_rem);
+
+      MPI_Recv(group,numel_proc,MPI_DOUBLE,
                root,MPI_ANY_TAG,MPI_COMM_WORLD,&status);  
    }
 }
@@ -374,7 +381,10 @@ int main(int argc, char *argv[]) {
 
    // local list size for MPI process -- 
    //   set for ideal case (perfect load balance)
-   const int local_list_size = list_size/numprocs; // set for ideal case 
+
+   const int list_size_ideal = list_size / numprocs;
+   const int list_size_rem   = list_size % numprocs;
+   const int local_list_size = list_size_ideal + (rank < list_size_rem);
 
    // clear out local histogram array, histogram_local
    for (int i=0;i<num_bins;i++) histogram_local[i]=0.0f;
@@ -406,15 +416,14 @@ int main(int argc, char *argv[]) {
 
    // reclaim dynamiclly allocated memory
    if (rank==0) {
-      delete histogram;
-      delete numbers;
+      delete[] histogram;
+      delete[] numbers;
    }
-   delete histogram_local;
-   delete numbers_local;
+   delete[] histogram_local;
+   delete[] numbers_local;
 
    // Terminate MPI Program -- perform necessary MPI housekeeping
    // clear out all buffers, remove handlers, etc.
    MPI_Finalize(); // Remove MPI Environment
 
 }
-
