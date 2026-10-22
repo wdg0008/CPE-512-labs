@@ -2,7 +2,8 @@
 
 .ONESHELL:
 
-EXES := histogram_serial.out histogram_MPI.out histogram_MPI_rev1.out
+EXES := histogram_serial.out histogram_MPI.out \
+		histogram_MPI_rev1.out histogram_MPI_rev2.out
 
 # only build obsolete C++ bindings when special argument passed
 ifeq ($(ASAX),1)
@@ -22,6 +23,12 @@ endif
 	mpic++ $^ -o $@
 
 histogram_MPI_rev1.out: histogram_MPI_rev1.cpp
+ifeq ($(HOST_OS),Linux)
+	module load openmpi
+endif
+	mpic++ $^ -o $@
+
+histogram_MPI_rev2.out: histogram_MPI_rev2.cpp
 ifeq ($(HOST_OS),Linux)
 	module load openmpi
 endif
