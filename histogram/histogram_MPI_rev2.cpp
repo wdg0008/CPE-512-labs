@@ -4,13 +4,13 @@
 /* (C MPI bindings)                  in Huntsville            */
 /**************************************************************/
 /*
-This program illustrates the basic concepts of SPMD programming using 
-MPI.  The program represents a common example that is used often in 
+This program illustrates the basic concepts of SPMD programming using
+MPI.  The program represents a common example that is used often in
 the CPE 412/512 text, creating a histogram of binned numbers.
 The program is written in such a way that it is assumed that the
 sequence of numbers is first read from a central source (in this case
-a data file) by a single MPI process (the root process) and then 
-partitioned into equal groups with each part being distributed 
+a data file) by a single MPI process (the root process) and then
+partitioned into equal groups with each part being distributed
 (scattered) to the local memory domains of the other MPI
 processes in the system. Each MPI process then locally computes its
 own histogram of the data for the data in its own domain. This is
@@ -22,9 +22,9 @@ The histogram output is then placed by the root process in a file
 which is named histogram.txt
 
 The following is a simplified version of the program which you will
-be asked to augment in a number of ways in future homework 
+be asked to augment in a number of ways in future homework
 assignments. Use the dmc.asc.edu or the Jetson Cluster system for
-these assignments. 
+these assignments.
 Notes: This implementation utilizes a minimum set of MPI methods
        call that include Init, Finalize, Comm_size,
        Comm_rank, Send, and Recv.
@@ -36,11 +36,11 @@ Notes: This implementation utilizes a minimum set of MPI methods
    mpic++ histogram_MPI.cpp -o histogram_MPI
 
 To execute:
-   
+
    GNU compiler
    use run_script_mpi histogram_MPI.sh
 
-*/  
+*/
 
 #include <iostream>
 #include <iomanip>
@@ -53,8 +53,8 @@ To execute:
 using namespace std;
 
 /*
-Function used by get_parameters routine to prompt the user to 
-interactively enter the next parameter and to return it to the 
+Function used by get_parameters routine to prompt the user to
+interactively enter the next parameter and to return it to the
 calling routine
 */
 template <class T>
@@ -76,12 +76,12 @@ Routine to retrieve the run time parameters which include
 1) the number of numbers in the number list,
 2) number of equally spaced bins to be used by the histogram,
 3) maximum value in bin range, 4) minimum value in bin range.
-If there is a 5th run time parameter then outputing of the numbers 
-array that was generated is suppressed 
+If there is a 5th run time parameter then outputing of the numbers
+array that was generated is suppressed
 If no parameters are supplied on the command line, then the program
 interactively prompts the user for the information.
 */
-void get_parameters(int *list_size,int *num_bins,double *max_bin_val, 
+void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
    double *min_bin_val,bool *num_list_out, int argc,char *argv[],
    int rank,int numprocs) {
 
@@ -90,7 +90,7 @@ void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
       // case where user did not enter number of numbers on command line
       // In this case, only one of the MPI processes needs to communicate
       // directly with the user. Since there will always be a MPI process
-      // with rank 0 this is the one that will perform the 
+      // with rank 0 this is the one that will perform the
       // human interface communication.
       if (rank==0) {
          *list_size=enter_next_param<int>("Enter number of numbers in list:");
@@ -98,7 +98,7 @@ void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
          *max_bin_val=enter_next_param<double>("Enter Upper Range of histogram:");
          *min_bin_val=enter_next_param<double>("Enter Lower Range of histogram:");
          char print_out=enter_next_param<char>("Suppress numbers array printing (y or n):");
-         if (print_out=='y' || print_out=='Y') *num_list_out=false; 
+         if (print_out=='y' || print_out=='Y') *num_list_out=false;
       }
       // since only the rank=0 MPI process is communicating with the
       // user, this process must send its value to all of the other MPI processes.
@@ -126,7 +126,7 @@ void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
          cout << "Usage: mpirun -np [num MPI processes] histogram_MPI [list size num_bins max_bin_val min_bin_val]" << endl;
       }
       MPI_Finalize(); // Terminate MPI
-      exit(0); // Exit Program 
+      exit(0); // Exit Program
    }
 }
 
@@ -134,12 +134,13 @@ void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
 Routine that fills a 1-D array with Random Data with values
 based on a normal distibution that has a mean of MEAN and a
 standard deviation of STDEV
-This simulates in some way what might happen if there was a 
+This simulates in some way what might happen if there was a
 single sequential data acquisition source that only one MPI process
 could handle at a time
 */
 #define MEAN  50.0f
 #define STDEV 20.0f
+
 void create_list(double *numbers,int list_size) {
    std::default_random_engine generator(123546);
    std::normal_distribution<double> distribution(MEAN,STDEV);
@@ -149,7 +150,7 @@ void create_list(double *numbers,int list_size) {
    }
 }
 
-// Routine that outputs the numbers matrix to the screen 
+// Routine that outputs the numbers matrix to the screen
 void print_matrix(double *numbers,int list_size)
 {
    for(int i=0;i<list_size;i++) {
@@ -181,66 +182,48 @@ int main(int argc, char *argv[]) {
 
    double *numbers = nullptr;
    int *histogram = nullptr;
+
    //  if root MPI Process (0) then
    if(rank==0) {
 
       // dynamically allocate from heap the histogram array on the root process
       try {
          histogram = new int[num_bins];
-      }
-      catch (exception& err) { 
-         cout << err.what() << " on Rank=0 MPI Process for histogram "
-              << "array :(" << endl << flush;
-         MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
-      }
 
-      // dynamically allocate from heap the numbers array on the root process
-      try {
          numbers = new double[list_size];
       }
-      catch (exception& err) { 
-         cout << err.what() << " on Rank=0 MPI Process for numbers "
-              << "array :(" << endl << flush;
-         MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
-      }
+      catch (const exception& err) {
+      cout << err.what() << " on Rank=0 MPI Process :(" << endl << flush;
+      MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
+   }
 
       // initialize numbers array with random data
       create_list(numbers,list_size);
 
       // print the array if printing is enabled
-      if (print_flg) { 
-         cout << "numbers matrix =" << endl; 
+      if (print_flg) {
+         cout << "numbers matrix =" << endl;
          print_matrix(numbers,list_size);
          cout << endl;
       }
    }
 
-   // dynamically allocate from heap the numbers_local array on each
-   // of the MPI Processes
-   const int numbers_local_array_sz = list_size/numprocs+1; 
-   double *numbers_local;
+   const int numbers_local_array_sz = list_size/numprocs+1;
+   double *numbers_local = nullptr;
+
+   int *histogram_local = nullptr;
+
+   // dynamically allocate from heap the arrays on each of the MPI Processes
    try {
       numbers_local = new double[numbers_local_array_sz];
-   }
-   catch (exception& err) { 
-      cout << err.what() << " on Rank=" << rank << 
-          " MPI Process for numbers_local array :(" << endl << flush;
-      MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
-   }
- 
-   // dynamically allocate from heap the histogram_local array on each
-   // of the MPI Processes
-   int *histogram_local;
-   try {
       histogram_local = new int[num_bins];
    }
-   catch (exception& err) { 
-      cout << err.what() << " on Rank=" << rank << 
-          " MPI Process for histogram_local array :(" << endl << flush;
+   catch (const exception& err) {
+      cout << err.what() << " on Rank=" << rank << " MPI Process :(" << endl << flush;
       MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
    }
 
-   // local list size for MPI process 
+   // local list size for MPI process
    const int list_size_ideal = list_size / numprocs;
    const int list_size_rem   = list_size % numprocs;
    const int local_list_size = list_size_ideal + (rank < list_size_rem);
@@ -251,8 +234,13 @@ int main(int argc, char *argv[]) {
 
    // only needed in the root, so only allocate memory there
    if (rank == 0) {
-      sendcounts = make_unique<int[]>(numprocs);
-      offsets = make_unique<int[]>(numprocs);
+      try {
+         sendcounts = make_unique<int[]>(numprocs);
+         offsets = make_unique<int[]>(numprocs);
+      } catch (const exception& err) {
+         cout << err.what() << " on Rank=0 MPI Process :(" << endl << flush;
+         MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
+      }
 
       // base case is easy
       offsets[0] = 0; // no displacement
@@ -266,15 +254,15 @@ int main(int argc, char *argv[]) {
    }
 
    // scatter the numbers array to all MPI processes in the system
-   MPI_Scatterv(numbers, sendcounts.get(), offsets.get(), MPI_DOUBLE, 
+   MPI_Scatterv(numbers, sendcounts.get(), offsets.get(), MPI_DOUBLE,
       numbers_local, local_list_size, MPI_DOUBLE, 0 , MPI_COMM_WORLD);
 
-   // create local histogram of the set of numbers associated 
+   // create local histogram of the set of numbers associated
    // with the current MPI process
 
    // clear out local histogram array, histogram_local
    for (int i=0;i<num_bins;i++) histogram_local[i]=0.0f;
- 
+
    // compute the local histogram for the local set of numbers
    for (int i=0;i<local_list_size;i++) {
       double num;
@@ -285,7 +273,7 @@ int main(int argc, char *argv[]) {
       }
    }
    // obtain final histogram on root MPI process by element-wise
-   // summation of each of the local histograms present on each 
+   // summation of each of the local histograms present on each
    // MPI process
    MPI_Reduce(histogram_local, histogram, num_bins, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
