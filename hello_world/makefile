@@ -23,17 +23,17 @@ hello_world.out: hello_world.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 hello_world_MPI.out: hello_world_MPI.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	mpic++ $< -o $@
+	$(MPICXX) $< -o $@
 
 # compiled only when special argument passed
 hello_world_MPI2.out: hello_world_MPI2.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load mpich
 endif
-	mpic++ $< -o $@
+	$(MPICXX) $< -o $@
 
 hello_world_OMP.out: hello_world_OMP.cpp
 	$(CXX) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)

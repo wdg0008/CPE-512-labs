@@ -17,16 +17,16 @@ endif
 all: $(EXES)
 
 add_num_MPI.out: add_num_MPI.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	mpic++ $< -o $@
+	$(MPICXX) $< -o $@
 
 add_num_MPI2.out: add_num_MPI2.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load mpich
 endif
-	mpic++ $< -o $@
+	$(MPICXX) $< -o $@
 
 add_num_rec_level_PTH1.out: add_num_rec_level_PTH1.cpp
 	$(CXX) $(CXXFLAGS) -pthread $< -o $@

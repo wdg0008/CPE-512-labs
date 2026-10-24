@@ -19,28 +19,28 @@ histogram_serial.out: histogram_serial.cpp
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 histogram_MPI.out: histogram_MPI.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	mpic++ $^ -o $@
+	$(MPICXX) $^ -o $@
 
 histogram_MPI_rev1.out: histogram_MPI_rev1.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	mpic++ $^ -o $@
+	$(MPICXX) $^ -o $@
 
 histogram_MPI_rev2.out: histogram_MPI_rev2.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	mpic++ $^ -o $@
+	$(MPICXX) $^ -o $@
 
 histogram_MPI2.out: histogram_MPI2.cpp
-ifeq ($(HOST_OS),Linux)
+ifeq ($(UNAME_S),Linux)
 	module load mpich
 endif
-	mpic++ $^ -o $@
+	$(MPICXX) $^ -o $@
 
 clean:
 	rm -f *.i* *.o*
