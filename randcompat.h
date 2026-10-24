@@ -1,5 +1,5 @@
-#ifndef WINRANDCOMPAT_H
-#define WINRANDCOMPAT_H
+#ifndef RANDCOMPAT_H
+#define RANDCOMPAT_H
 
 #include <cstdint>
 

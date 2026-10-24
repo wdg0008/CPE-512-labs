@@ -17,21 +17,15 @@ To execute:
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <stdlib.h>
-#include <sys/time.h>
+
+#include "../randcompat.h"
+#include "../ctimer_utils.h"
 
 using namespace std;
 
 #define SEED 2397           /* random number seed */
 #define MAX_VALUE  100.0    /* maximum value of any number in list */
 #define MIN_VALUE  0.0      /* minimum value of any number in list */
-
-// timer macros
-#define TIMER_CLEAR     (tv1.tv_sec = tv1.tv_usec = tv2.tv_sec = tv2.tv_usec = 0)
-#define TIMER_START     gettimeofday(&tv1, (struct timezone*)0)
-#define TIMER_ELAPSED   ((tv2.tv_usec-tv1.tv_usec)+((tv2.tv_sec-tv1.tv_sec)*1000000))
-#define TIMER_STOP      gettimeofday(&tv2, (struct timezone*)0)
-struct timeval tv1,tv2;
 
 /*
 Routine to retrieve the data size of the nums array from the
@@ -144,5 +138,5 @@ int main( int argc, char *argv[])
         << " seconds" << endl;
 
    // reclaim dynamiclly allocated memory
-   delete nums;
+   delete[] nums;
 }

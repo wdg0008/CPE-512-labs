@@ -25,18 +25,14 @@
 // compilation:
 // g++ tsp_PTH2.cpp -o tsp_PTH2 -lpthread -Ofast
 //
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <string.h>
 #include <pthread.h>
 #include <memory>
 
+#include "../randcompat.h"
 #include "../ctimer_utils.h"
-
-#ifdef _WIN32
-#include "winrandcompat.h"
-#endif
 
 using namespace std;
 

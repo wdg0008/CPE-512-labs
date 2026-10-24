@@ -45,8 +45,9 @@ To execute using Job Queuing system:
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <stdlib.h>
 #include <mpi.h> /* MPI Prototype Header Files */
+
+#include "../randcompat.h"
 
 using namespace std;
 

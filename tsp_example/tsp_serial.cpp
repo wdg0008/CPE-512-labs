@@ -12,15 +12,11 @@
 // compilation:
 // g++ tsp_serial.cpp -o tsp_serial -Ofast
 //
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 
+#include "../randcompat.h"
 #include "../ctimer_utils.h"
-
-#ifdef _WIN32
-#include "winrandcompat.h"
-#endif
 
 using namespace std;
 
