@@ -170,7 +170,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/c,c++,visualstudiocode,linux,windows,macos
 
 # Begin my additions
-.*
 !.asc_queue
 !.clangd
 !.gitignore
