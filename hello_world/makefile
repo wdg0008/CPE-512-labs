@@ -1,5 +1,7 @@
 #!/usr/bin/env make
 
+include ../toolchains.mk
+
 # Special directive so all recipe lines for one target run in the same shell
 # preserves environment modifications from loading modules within a target
 .ONESHELL:

@@ -1,5 +1,7 @@
 #!/usr/bin/env make
 
+include ../toolchains.mk
+
 .ONESHELL:
 
 .PHONY: all clean

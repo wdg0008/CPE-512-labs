@@ -49,8 +49,7 @@ This is the classic algorithm to find the least expensive hamiltonian cycle in a
 
 This builds and runs easily on ASAX right now. If you want to try this at home, the setup details vary widely by platform and are listed below based on OS and compiler vendor. Once the prerequisites are installed, run `make -j N` to build in parallel on `N` many processors.
 
->[!Warning]
->The individual makefiles in each folder cannot be build independently, as they depend on exported variables from the main one. Instead, run `make <subfolder_name>` to compile just one unit.
+Each unit has an independent makefile. Run `make` from a unit directory to build it, or run `make <subfolder_name>` from the repository root to build just one unit.
 
 ## Linux
 

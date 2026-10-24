@@ -1,5 +1,7 @@
 #!/usr/bin/env make
 
+include ../toolchains.mk
+
 .ONESHELL:
 
 EXES := histogram_serial.out histogram_MPI.out \
