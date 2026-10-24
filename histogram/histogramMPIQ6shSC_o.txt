@@ -1,0 +1,122 @@
+setting asax scratch directory
+ 
+============================================================
+=====         Summary of your script job               =====
+============================================================
+  The script file is: histogram_MPI_Q6.sh
+  The time limit is 1:00:00 HH:MM:SS.
+  The target directory is: /home/uahclsf0079/histogram
+  The working directory is:  /scratch-local/uahclsf0079.histogramMPIQ6shSC.107778.asax-pbs1
+  The memory limit is: 200mb
+  The job will start running after: 202610232121.12
+  Job Name: histogramMPIQ6shSC
+  Queue: -q class -W group_list=classq
+  Constraints: 
+  Using  5  cores on master node  asax020.asc.edu
+  Node list:  asax020.asc.edu asax020.asc.edu asax020.asc.edu asax020.asc.edu asax020.asc.edu
+  Cores:  5
+  Command typed:
+/scripts/run_script_mpi histogram_MPI_Q6.sh     
+  Queue submit command:
+qsub -q class -W group_list=classq -j oe -N histogramMPIQ6shSC -a 202610232121.12 -r n -M wdg0008@uah.edu -m n -l walltime=1:00:00 -l select=5:mpiprocs=1:mem=40mb 
+ 
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  6
+87.5  1
+1 MPI Process OpenMPI Implementation
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  6
+87.5  1
+2 MPI Process OpenMPI Implementation
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  6
+87.5  1
+4 MPI Process OpenMPI Implementation
+numbers matrix =
+48.1615
+57.7584
+42.0876
+50.5218
+75.8859
+55.6291
+34.7784
+25.8196
+53.4319
+12.6648
+27.9336
+49.3952
+22.3363
+69.2959
+48.6084
+74.4085
+36.2522
+
+Histogram Information
+12.5  2
+37.5  8
+62.5  6
+87.5  1
+5 MPI Process OpenMPI Implementation
