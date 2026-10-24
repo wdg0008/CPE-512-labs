@@ -60,14 +60,14 @@ JUNK := *.i* *.o* *.exe
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 %_MPI.out: %_MPI.cpp
-ifeq ($(UNAME_S),Linux)
+ifeq ($(ASAX),1)
 	module load openmpi
 endif
 	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 # compiled only when special argument passed
 %_MPI2.out: %_MPI2.cpp
-ifeq ($(UNAME_S),Linux)
+ifeq ($(ASAX),1)
 	module load mpich
 endif
 	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@

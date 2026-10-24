@@ -20,7 +20,7 @@ REV_SOURCES := $(wildcard *MPI_rev[1-9].cpp)
 REV_TARGETS := $(REV_SOURCES:.cpp=.out)
 
 $(REV_TARGETS): %.out: %.cpp
-ifeq ($(UNAME_S),Linux)
+ifeq ($(ASAX),1)
 	module load openmpi
 endif
 	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
