@@ -31,3 +31,4 @@ OMP_LIBS     := -lomp
 
 PTHREAD_LDFLAGS := -L$(PTHBAR_DIR)
 PTHREAD_LIBS    := -pthread -lpthread_barrier
+PTHREAD_BARRIER_TARGET := $(PTHBAR_LIB)

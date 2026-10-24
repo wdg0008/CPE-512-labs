@@ -24,16 +24,12 @@
 // g++ tsp_OMP.cpp -o tsp_OMP -fopenmp -Ofast
 //
 
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <omp.h>
 
+#include "../randcompat.h"
 #include "../ctimer_utils.h"
-
-#ifdef _WIN32
-#include "winrandcompat.h"
-#endif
 
 using namespace std;
 

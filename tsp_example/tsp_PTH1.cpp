@@ -20,18 +20,16 @@
 // compilation:
 // g++ tsp_PTH1.cpp -o tsp_PTH1 -lpthread -Ofast
 //
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <pthread.h>
 #include <memory>
 #include <string.h>
 
+#include "../randcompat.h"
 #include "../ctimer_utils.h"
 
-#ifdef _WIN32
-#include "winrandcompat.h"
-#endif
+
 using namespace std;
 
 #define MX_CITIES 30       // maximum number of cities in tour

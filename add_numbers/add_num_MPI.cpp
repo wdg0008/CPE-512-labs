@@ -45,8 +45,9 @@ To execute using Job Queuing system:
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include <stdlib.h>
 #include <mpi.h> /* MPI Prototype Header Files */
+
+#include "../randcompat.h"
 
 using namespace std;
 
@@ -315,7 +316,7 @@ int main( int argc, char *argv[])
 
    // reclaim dynamiclly allocated memory
    if (rank==0) delete numbers;
-   delete group;
+   delete[] group;
 
    // Terminate MPI Program -- perform necessary MPI housekeeping
    // clear out all buffers, remove handlers, etc.

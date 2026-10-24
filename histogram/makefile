@@ -1,5 +1,7 @@
 #!/usr/bin/env make
 
+include ../toolchains.mk
+
 .ONESHELL:
 
 EXES := histogram_serial.out histogram_MPI.out \
@@ -13,32 +15,15 @@ endif
 .PHONY: all clean
 all: $(EXES)
 
-histogram_serial.out: histogram_serial.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# static rule to generate MPI revision targets
+REV_SOURCES := $(wildcard *MPI_rev[1-9].cpp)
+REV_TARGETS := $(REV_SOURCES:.cpp=.out)
 
-histogram_MPI.out: histogram_MPI.cpp
-ifeq ($(HOST_OS),Linux)
+$(REV_TARGETS): %.out: %.cpp
+ifeq ($(ASAX),1)
 	module load openmpi
 endif
-	mpic++ $^ -o $@
-
-histogram_MPI_rev1.out: histogram_MPI_rev1.cpp
-ifeq ($(HOST_OS),Linux)
-	module load openmpi
-endif
-	mpic++ $^ -o $@
-
-histogram_MPI_rev2.out: histogram_MPI_rev2.cpp
-ifeq ($(HOST_OS),Linux)
-	module load openmpi
-endif
-	mpic++ $^ -o $@
-
-histogram_MPI2.out: histogram_MPI2.cpp
-ifeq ($(HOST_OS),Linux)
-	module load mpich
-endif
-	mpic++ $^ -o $@
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

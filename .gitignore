@@ -176,6 +176,10 @@ $RECYCLE.BIN/
 wells_class
 *.bk
 *_test.sh
+!.gitattributes
+
+# all the other junk
+.*
 
 # For MATLAB
 *.asv
