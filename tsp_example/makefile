@@ -7,19 +7,15 @@ CXXFLAGS += -O3 -ffast-math
 
 .PHONY: all clean
 
+# mostly use included pattern rules
 all: tsp_serial.out tsp_PTH1.out tsp_PTH2.out tsp_OMP.out
 
-tsp_serial.out: tsp_serial.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# static rule to generate pthreads targets
+PTHREAD_SOURCES := $(wildcard *_PTH[1-9].cpp)
+PTHREAD_TARGETS := $(PTHREAD_SOURCES:.cpp=.out)
 
-tsp_PTH1.out: tsp_PTH1.cpp
-	$(CXX) $(CXXFLAGS) -pthread $^ -o $@
-
-tsp_PTH2.out: tsp_PTH2.cpp
-	$(CXX) $(CXXFLAGS) -pthread $^ -o $@
-
-tsp_OMP.out: tsp_OMP.cpp
-	$(CXX) $(CXXFLAGS) $(OMP_CXXFLAGS) $^ -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
+$(PTHREAD_TARGETS): %.out: %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $< -o $@
 
 clean:
 	rm -f $(JUNK)

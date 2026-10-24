@@ -15,32 +15,15 @@ endif
 .PHONY: all clean
 all: $(EXES)
 
-histogram_serial.out: histogram_serial.cpp
-	$(CXX) $(CXXFLAGS) $^ -o $@
+# static rule to generate MPI revision targets
+REV_SOURCES := $(wildcard *MPI_rev[1-9].cpp)
+REV_TARGETS := $(REV_SOURCES:.cpp=.out)
 
-histogram_MPI.out: histogram_MPI.cpp
+$(REV_TARGETS): %.out: %.cpp
 ifeq ($(UNAME_S),Linux)
 	module load openmpi
 endif
-	$(MPICXX) $^ -o $@
-
-histogram_MPI_rev1.out: histogram_MPI_rev1.cpp
-ifeq ($(UNAME_S),Linux)
-	module load openmpi
-endif
-	$(MPICXX) $^ -o $@
-
-histogram_MPI_rev2.out: histogram_MPI_rev2.cpp
-ifeq ($(UNAME_S),Linux)
-	module load openmpi
-endif
-	$(MPICXX) $^ -o $@
-
-histogram_MPI2.out: histogram_MPI2.cpp
-ifeq ($(UNAME_S),Linux)
-	module load mpich
-endif
-	$(MPICXX) $^ -o $@
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 clean:
 	rm -f $(JUNK)

@@ -54,3 +54,30 @@ ASAX ?= 0
 PTHREAD_BARRIER_TARGET ?=
 # Specify what to clean out
 JUNK := *.i* *.o* *.exe
+
+# Pattern Rules
+%.out: %.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+%_MPI.out: %_MPI.cpp
+ifeq ($(UNAME_S),Linux)
+	module load openmpi
+endif
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+# compiled only when special argument passed
+%_MPI2.out: %_MPI2.cpp
+ifeq ($(UNAME_S),Linux)
+	module load mpich
+endif
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+%_PTH.out: %_PTH.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $< -o $@
+
+%_OMP.out: %_OMP.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
+
+# Combo pthreads and OpenMP code
+%_PTH_OMP.out: %_PTH_OMP.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
