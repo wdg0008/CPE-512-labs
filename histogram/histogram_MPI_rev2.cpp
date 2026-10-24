@@ -44,6 +44,7 @@ To execute:
 
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <sstream>
 #include <random>
 #include <exception>
@@ -51,35 +52,6 @@ To execute:
 
 using namespace std;
 
-/*
-ONE-TO-ALL BROADCAST COMMUNICATION ROUTINE
-Routine to transfer from the root MPI process the value of
-the 'number' parameter to all other MPI processes in the system.
-*/
-void broadcast_scalar(void *number,MPI_Datatype mpi_datatype,int root, 
-   int rank, int numprocs) {
-   MPI_Status status;
-
-   // root send value of number to each of the other processes
-   // using a locally blocking point-to-point send
-   if (rank==root) {
-      int tag=123;
-      for(int mpiproc=0;mpiproc<numprocs;mpiproc++) {
-         if (mpiproc!=root) {
-            MPI_Send(number,1,mpi_datatype,mpiproc,tag,MPI_COMM_WORLD); 
-         }
-      }
-   }
-   // if not root process execute a blocking point-to-point receive
-   // with the source being the root process and direct this data to
-   // the local copy of 'num'
-   else {
-      MPI_Recv(number,1,mpi_datatype,
-               root, MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-
-   }
-
-}
 /*
 Function used by get_parameters routine to prompt the user to 
 interactively enter the next parameter and to return it to the 
@@ -129,14 +101,13 @@ void get_parameters(int *list_size,int *num_bins,double *max_bin_val,
          if (print_out=='y' || print_out=='Y') *num_list_out=false; 
       }
       // since only the rank=0 MPI process is communicating with the
-      // user, this process must send its value to all of the
-      // other MPI process. It can do this with the broadcast_scalar()
-      // broadcast routine.
-      // NOTE: ALL MPI PROCESSES executed the broadcast_scalar function
-      broadcast_scalar(list_size,MPI_INT,0,rank,numprocs);
-      broadcast_scalar(num_bins,MPI_INT,0,rank,numprocs);
-      broadcast_scalar(max_bin_val,MPI_DOUBLE,0,rank,numprocs);
-      broadcast_scalar(min_bin_val,MPI_DOUBLE,0,rank,numprocs);
+      // user, this process must send its value to all of the other MPI processes.
+      // Uses built-in broadcast library function to send a scalar (count = 1)
+      // Sent to all MPI processes since MPI_COMM_WORLD is universal
+      MPI_Bcast(list_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(num_bins, 1, MPI_INT, 0, MPI_COMM_WORLD);
+      MPI_Bcast(max_bin_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+      MPI_Bcast(min_bin_val, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD);
    }
    else if (argc==5 || argc==6) {
       // Two Command Line Argument case:
@@ -186,109 +157,6 @@ void print_matrix(double *numbers,int list_size)
    }
 }
 
-
-/* ONE-TO-ALL SCATTER ROUTINE
-Routine to divide and scatter the number data array that resides on the
-root MPI process to all other MPI processes in the system.
-The number data size is given by the'num_size' parameter its source 
-address is given by the '*numbers' parameter, and the destination
-group data associated with the current process is given by the
-'*group' parameter.  */
-void scatter(double *numbers,double *group,int num_size, int root, int rank,int numprocs)
-{
-   MPI_Status status;
-   int tag = 234;
-   
-   // determine number of elements in subarray groups to be processed by
-   // each MPI process assuming a perfectly even distribution of elements 
-   const int numel_ideal = num_size/numprocs;
-   const int numel_rem = num_size % numprocs; // not const, counts down to zero
-
-   // if root MPI process send portion of numbers array to each of the
-   // the other MPI processes as well as make a copy of the portion
-   // of the numbers array that is slated for the root MPI process
-   if (rank==root) {
-      int begin_element=0;
-
-      for(int mpiproc=0;mpiproc<numprocs;mpiproc++) {
-         // recompute for each process iterated over (remainder must run out)
-         int numel = numel_ideal + (mpiproc < numel_rem);
-      
-         // in MPI root process case just copy the appropriate subsection
-         // locally from the numbers array over to the group array
-         if (mpiproc==root) {
-            for (int i=0;i<numel;i++) {
-               group[i]=numbers[i+begin_element];
-            }
-         }
-         // if not the root process send the subsection data to
-         // the next MPI process
-         else {
-            MPI_Send(&numbers[begin_element],numel,
-               MPI_DOUBLE,mpiproc,tag,MPI_COMM_WORLD);
-         }
-         // point to next unsent or uncopied data in numbers array
-         begin_element += numel;
-      }
-   }
-   // if a non root process just receive the data
-   else {
-      // add an extra if ID less than remainder to ensure fair distribution
-      const int numel_proc = numel_ideal + (rank < numel_rem);
-
-      MPI_Recv(group,numel_proc,MPI_DOUBLE,
-               root,MPI_ANY_TAG,MPI_COMM_WORLD,&status);  
-   }
-}
-/*
-ALL-TO-ONE Reduce ROUTINE
-Routine to communicate the local histograms that are present on each
-of the MPI processes to the root MPI process to form a single histogram
-of the entire data set. This is done by performing an element-by-element
-vector addition as part of this communication operation. This type
-of communication is called a reduction because the information of multiple
-data structures has been combined by performing some form of associate 
-operation into a smaller data structure. The location of this structure
-is the MPI process that is designated as the root process in the function
-arguments.
-Parameters:
-   histogram == location of the reduced histogram on the root process
-   histogram_local == location of each MPI process computed histogram
-   histogram_size == number of bins in the histogram
-   root == MPI rank of the root MPI process
-*/
-void reduce(int *histogram, int *histogram_local,int histogram_size, 
-   int root, int rank,int numprocs) {
-   int tag = 123;
-   // if MPI root process perform an element-wise addition of the histograms 
-   // computed on each of the MPI processes. 
-   if (rank==root) {
-      // first initialize root MPI processes' histogram data structure with
-      // the root's locally computed histogram
-      for (int i=0;i<histogram_size;i++) {
-         histogram[i]=histogram_local[i];
-      }
-      // then receive each of the other process' locally computed histogram
-      // and add them element by element to the current histogram
-      MPI_Status status;
-      for(int mpiproc=0;mpiproc<numprocs;mpiproc++) {
-         if (mpiproc!=root) {
-            MPI_Recv(histogram_local,histogram_size,MPI_INT,
-            mpiproc,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-            for (int i=0;i<histogram_size;i++) {
-               histogram[i]+=histogram_local[i];
-            }
-         } 
-      }
-   }
-   // if the current MPI process is not the root process then send this
-   // process' local histogram data to the root MPI process
-   else {
-      MPI_Send(histogram_local,histogram_size,MPI_INT, 
-         root, tag, MPI_COMM_WORLD);
-   }
-}
-
 // MAIN ROUTINE: parallel histogram calculation
 int main(int argc, char *argv[]) {
 
@@ -311,8 +179,8 @@ int main(int argc, char *argv[]) {
    // compute the range associated with each bin
    const double bin_range = (max_val-min_val)/num_bins;
 
-   double *numbers;
-   int *histogram;
+   double *numbers = nullptr;
+   int *histogram = nullptr;
    //  if root MPI Process (0) then
    if(rank==0) {
 
@@ -372,19 +240,37 @@ int main(int argc, char *argv[]) {
       MPI_Abort(MPI_COMM_WORLD,1); // abort the MPI Environment
    }
 
-   // scatter the numbers array to all MPI processes in
-   // the system
-   scatter(numbers,numbers_local,list_size,0,rank,numprocs);
-
-   // create local histogram of the set of numbers associated 
-   // with the current MPI process
-
-   // local list size for MPI process -- 
-   //   set for ideal case (perfect load balance)
-
+   // local list size for MPI process 
    const int list_size_ideal = list_size / numprocs;
    const int list_size_rem   = list_size % numprocs;
    const int local_list_size = list_size_ideal + (rank < list_size_rem);
+
+   // use fancy self-deleting arrays that default to nullptr
+   unique_ptr<int[]> sendcounts;
+   unique_ptr<int[]> offsets;
+
+   // only needed in the root, so only allocate memory there
+   if (rank == 0) {
+      sendcounts = make_unique<int[]>(numprocs);
+      offsets = make_unique<int[]>(numprocs);
+
+      // base case is easy
+      offsets[0] = 0; // no displacement
+      sendcounts[0] = local_list_size; // if any remainder, it starts here
+
+      // continue the induction chain
+      for (int proc = 1; proc < numprocs; proc++) {
+         sendcounts[proc] = list_size_ideal + (proc < list_size_rem);
+         offsets[proc] = offsets[proc-1] + sendcounts[proc-1];
+      }
+   }
+
+   // scatter the numbers array to all MPI processes in the system
+   MPI_Scatterv(numbers, sendcounts.get(), offsets.get(), MPI_DOUBLE, 
+      numbers_local, local_list_size, MPI_DOUBLE, 0 , MPI_COMM_WORLD);
+
+   // create local histogram of the set of numbers associated 
+   // with the current MPI process
 
    // clear out local histogram array, histogram_local
    for (int i=0;i<num_bins;i++) histogram_local[i]=0.0f;
@@ -401,7 +287,7 @@ int main(int argc, char *argv[]) {
    // obtain final histogram on root MPI process by element-wise
    // summation of each of the local histograms present on each 
    // MPI process
-   reduce(histogram,histogram_local,num_bins,0,rank,numprocs);
+   MPI_Reduce(histogram_local, histogram, num_bins, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
    // output sum from root MPI process
    if (rank==0) {
@@ -425,5 +311,5 @@ int main(int argc, char *argv[]) {
    // Terminate MPI Program -- perform necessary MPI housekeeping
    // clear out all buffers, remove handlers, etc.
    MPI_Finalize(); // Remove MPI Environment
-
+   return 0;
 }
