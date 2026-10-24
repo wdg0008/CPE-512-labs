@@ -13,4 +13,4 @@ heat_2d_OMP.out: heat_2d_OMP.cpp
 	$(CXX) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

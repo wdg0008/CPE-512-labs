@@ -52,3 +52,5 @@ MPICXX   ?= mpic++
 ASAX ?= 0
 # Only needed on macOS, so default to nothing
 PTHREAD_BARRIER_TARGET ?=
+# Specify what to clean out
+JUNK := *.i* *.o* *.exe

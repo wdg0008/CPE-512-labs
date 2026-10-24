@@ -41,4 +41,4 @@ add_num_serial.out: add_num_serial.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

@@ -43,4 +43,4 @@ endif
 	$(MPICXX) $^ -o $@
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

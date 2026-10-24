@@ -48,4 +48,4 @@ prime.out: prime.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

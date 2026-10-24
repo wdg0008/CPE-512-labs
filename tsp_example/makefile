@@ -22,4 +22,4 @@ tsp_OMP.out: tsp_OMP.cpp
 	$(CXX) $(CXXFLAGS) $(OMP_CXXFLAGS) $^ -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
 clean:
-	rm -f *.i* *.o*
+	rm -f $(JUNK)

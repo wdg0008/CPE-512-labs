@@ -29,4 +29,4 @@ heat_1d_PTH5.out: heat_1d_PTH5.cpp $(PTHREAD_BARRIER_TARGET)
 	$(CXX) $(CPPFLAGS) $(PTHREAD_CPPFLAGS) $(CXXFLAGS) -o $@ $^ $(PTHREAD_LDFLAGS) $(PTHREAD_LIBS)
 
 clean:
-	rm -f $(EXES) *.txt *.i* *.o*
+	rm -f $(JUNK) *.txt
