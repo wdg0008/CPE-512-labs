@@ -6,6 +6,7 @@ $script:CommonCxxFlags = @(
     '/std:c++20'
     '/W3' # /W4 is too aggressive in most cases.
     '/permissive-'
+    '/Zc:preprocessor'
 )
 
 function Invoke-MSVCBuild {
