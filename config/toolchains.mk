@@ -1,6 +1,5 @@
-# Find the repository and configuration directories.
-ROOT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-TOOLCHAIN_DIR := $(ROOT_DIR)config/
+# Find the configuration directory.
+TOOLCHAIN_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 # Detect the host operating system, unless the caller supplied one.
 # From https://stackoverflow.com/questions/714100/os-detecting-makefile
@@ -53,7 +52,7 @@ ASAX ?= 0
 # Only needed on macOS, so default to nothing
 PTHREAD_BARRIER_TARGET ?=
 # Specify what to clean out
-JUNK := *.i* *.o* *.exe
+JUNK := *.i* *.o* *.exe *.obj
 
 # Pattern Rules
 # ORDER MATTERS ON MACOS BSD-STYLE MAKE!!!!!

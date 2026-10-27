@@ -24,10 +24,12 @@ function Invoke-MSVCBuild {
 
     $sourcePath = (Resolve-Path -LiteralPath $Source).Path
     $outputPath = $Output
+    $objectPath = [System.IO.Path]::ChangeExtension($outputPath, '.obj')
 
     $arguments = @(
         $script:CommonCxxFlags
         $CompilerFlags
+        "/Fo:$objectPath"
         "/Fe:$outputPath"
         $sourcePath
     )
@@ -37,7 +39,7 @@ function Invoke-MSVCBuild {
         $arguments += $LinkerFlags
     }
 
-    Write-Host "Building $sourcePath -> $outputPath"
+    Write-Host "cl.exe $arguments" -ForegroundColor Yellow
 
     & cl.exe @arguments
 

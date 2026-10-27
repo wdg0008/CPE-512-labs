@@ -1,6 +1,6 @@
 #!/usr/bin/env make
 
-include ../toolchains.mk
+include ../config/toolchains.mk
 
 .ONESHELL:
 
