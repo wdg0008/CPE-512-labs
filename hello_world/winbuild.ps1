@@ -7,26 +7,24 @@ $CommonRules = Join-Path $RepoRoot 'winbuild_common.ps1'
 
 . $CommonRules
 
-Push-Location $PSScriptRoot
-try {
-    # Ordinary C++ program
+$serialTargets = @('hello_world')
+$openMpTargets = @('hello_world_OMP')
+$msmpiTargets = @('hello_world_MPI', "prime")
+
+foreach ($target in $serialTargets) {
     Build-Serial `
-        -Source 'hello_world.cpp' `
-        -Output 'hello_world.exe'
-
-    # OpenMP program
-    Build-OpenMP `
-        -Source 'hello_world_OMP.cpp' `
-        -Output 'hello_world_OMP.exe'
-
-    # MPI program
-    Build-MSMPI `
-        -Source 'hello_world_MPI.cpp' `
-        -Output 'hello_world_MPI.exe'
-
-    # Uncomment this if you also want the ordinary prime example:
-    Build-Serial -Source 'prime.cpp' -Output 'prime.exe'
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
 }
-finally {
-    Pop-Location
+
+foreach ($target in $openMpTargets) {
+    Build-OpenMP `
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
+}
+
+foreach ($target in $msmpiTargets) {
+    Build-MSMPI `
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
 }

@@ -4,7 +4,7 @@ $script:CommonCxxFlags = @(
     '/nologo'
     '/EHsc'
     '/std:c++20'
-    '/W4'
+    '/W3' # /W4 is too aggressive in most cases.
     '/permissive-'
 )
 
@@ -23,12 +23,7 @@ function Invoke-MSVCBuild {
     )
 
     $sourcePath = (Resolve-Path -LiteralPath $Source).Path
-    $outputPath = if ([System.IO.Path]::IsPathRooted($Output)) {
-        [System.IO.Path]::GetFullPath($Output)
-    }
-    else {
-        [System.IO.Path]::GetFullPath((Join-Path -Path (Get-Location).Path -ChildPath $Output))
-    }
+    $outputPath = $Output
 
     $arguments = @(
         $script:CommonCxxFlags
