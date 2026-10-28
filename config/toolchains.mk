@@ -1,5 +1,7 @@
 # Find the configuration directory.
 TOOLCHAIN_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+# The repository root is the parent of the configuration directory.
+ROOT_DIR := $(abspath $(TOOLCHAIN_DIR)..)/
 
 # Detect the host operating system, unless the caller supplied one.
 # From https://stackoverflow.com/questions/714100/os-detecting-makefile
