@@ -11,7 +11,7 @@ Compilation on ascx.asc.edu
 
      Using Intel Compiler
      module load intel
-     icpc hello_world.cpp -o hello_world_intel
+     icpx hello_world.cpp -o hello_world_intel
 
      Using NVIDIA hpc Compiler
      module load pgi
@@ -26,9 +26,9 @@ int main (int argc, char *argv[]) {
    #ifdef __PGI
       // Compiled with the NVIDA HPC Compiler
       cout << "Hello world from NVIDA HPC compiler" << endl << flush;
-   #elif  __INTEL_COMPILER
+   #elif  __INTEL_LLVM_COMPILER
       // Compiled with Intel Compiler
-      cout << "Hello world from Intel compiler" << endl << flush;
+      cout << "Hello world from Intel LLVM compiler" << endl << flush;
    #elif __GNUC__
       // Compiled with GNU Compiler
       cout << "Hello world from GNU compiler" << endl << flush;

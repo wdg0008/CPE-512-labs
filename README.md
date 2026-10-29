@@ -131,7 +131,7 @@ pacman -S base-devel mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-msmpi
 
 The build system for this repository is simply a set of makefiles, as each program is born of a self-contained source file.
 
-On any of the above platforms, you can invoke `make` in the root folder or in any of the subfolders that contain project code. If you set everything up correctly, it should work seamlessly.
+On any of the above platforms, you can invoke `make` in the root folder or in any of the subfolders that contain project code. If you set everything up correctly, it should work seamlessly. By default, it uses `g++`.
 
 It uses a `toolchains.mk` file to automatically resolve the OS, apply compatibility patches, and set up processor-specific definitions along with build flags. Most of the targets are built from the pattern rules it contains, making individual project makefiles very short and sweet (check them out if you're curious).
 
@@ -175,6 +175,25 @@ By default, each `makefile` will **not** compile examples that rely on these obs
 make ASAX=1
 ```
 
+### Try the Intel Compiler
+
+If you have a Linux system with an Intel processor, try installing the [Intel Compiler](https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/developer-guide-reference/2026-0/overview.html) and setting it up.
+
+>[!Note]
+>The last version they released supporting macOS was 2023.x, which is no longer available from the archive. This corresponds to Apple's transition from Intel microprocessors to ARM designs.
+
+To build with this instead of GCC, you can just add an option to your invocation of `make` anywhere in the repository:
+
+```bash
+# on ASAX, you have to load the module for the compiler first
+module load intel
+make INTEL=1
+
+# build everything on ASAX, including obsolete C++ bindings, with the Intel compiler
+module load intel
+make INTEL=1 ASAX=1
+```
+
 ## Using Microsoft Visual Studio on Windows
 
 >[!Warning]
@@ -208,7 +227,7 @@ cd hello_world
 .\winbuild.ps1
 ```
 
-The individual commands to compile your code can be quite and cumbersome to use:
+The individual commands to compile your code can be quite cumbersome to remember and use:
 
 ```powershell
 # set up by moving to hello_world example code

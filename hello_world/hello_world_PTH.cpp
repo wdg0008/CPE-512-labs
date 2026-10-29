@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
        << "Program compiled using "
        #ifdef __PGI
           << "NVIDA HPC compiler" 
-       #elif __INTEL_COMPILER 
+       #elif __INTEL_LLVM_COMPILER 
           << "Intel compiler" 
        #elif __GNUC__
           << "GNU compiler" 
