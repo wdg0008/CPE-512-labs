@@ -11,7 +11,7 @@ CPPFLAGS += -O3 -ffast-math
 
 EXES := heat_2d_serial.out heat_2d_OMP.out heat_2d_loc_blk_MPI_rev1.out \
 		heat_2d_loc_blk_MPI_rev2.out heat_2d_loc_blk_MPI.out \
-		heat_2d_sync_MPI.out heat_2d_serial_c.out
+		heat_2d_sync_MPI.out heat_2d_serial_c.out heat_2d_usr_buf_MPI.out
 
 ifeq ($(ASAX),1)
 EXES += heat_2d_loc_blk_MPI2.out
