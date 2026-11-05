@@ -16,7 +16,9 @@ $openMpTargets = @(
 )
 
 $msmpiTargets = @(
-    "heat_2D_loc_blk_MPI"
+    "heat_2D_loc_blk_MPI",
+    "heat_2D_loc_blk_MPI_rev1"
+    "heat_2D_loc_blk_MPI_rev2"
 )
 
 foreach ($target in $serialTargets) {

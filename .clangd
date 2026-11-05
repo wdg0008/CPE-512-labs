@@ -1,5 +1,11 @@
 CompileFlags:
+  # Remove unless using Visual Studio on Windows
+  Compiler: clang-cl
   Add:
+    # flags for using MSMPI on Windows
+    - /Zc:preprocessor
+    - '/IC:/Program Files (x86)/Microsoft SDKs/MPI/Include'
+    # Flags for using mpi on ASAX
     # OpenMPI
     # module load openmpi
     # mpic++ -show
@@ -7,6 +13,4 @@ CompileFlags:
     # MPICH C++ bindings (deprecated)
     # module load mpich
     # mpicxx -show
-    - "-I/apps/x86-64/apps/spack_1.0.1/spack/opt/spack/linux-zen3/mpich-4.3.0-lyg2hzoteyymijyuhddl5s5bplzx75af/include"
-    # The two MPI implementations both come from the same header file and are incompatible. Comment one out
-    - "-pthread"
+    # - "-I/apps/x86-64/apps/spack_1.0.1/spack/opt/spack/linux-zen3/mpich-4.3.0-lyg2hzoteyymijyuhddl5s5bplzx75af/include"
