@@ -9,7 +9,7 @@ CPPFLAGS += -O3 -ffast-math
 
 .PHONY: all clean
 
-EXES := heat_2d_serial.out heat_2d_OMP.out \
+EXES := heat_2d_serial.out heat_2d_OMP.out heat_2d_loc_blk_MPI_rev1.out \
 		heat_2d_loc_blk_MPI.out heat_2d_serial_c.out
 
 ifeq ($(ASAX),1)
@@ -22,6 +22,16 @@ all: $(EXES)
 # %.out: %.cpp
 heat_2d_serial_c.out: heat_2d_serial.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+
+# static rule to generate MPI revision targets
+REV_SOURCES := $(wildcard *MPI_rev[1-9].cpp)
+REV_TARGETS := $(REV_SOURCES:.cpp=.out)
+
+$(REV_TARGETS): %.out: %.cpp
+ifeq ($(ASAX),1)
+	module load openmpi
+endif
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
 
 clean:
 	rm -f $(JUNK)
