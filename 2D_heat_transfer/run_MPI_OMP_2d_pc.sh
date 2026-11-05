@@ -11,21 +11,21 @@
 if test -f "./heat_2d_serial.cpp" 
   then
   echo "Recompiling Reference Serial Source file heat_2d_serial.cpp"
-  echo "g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast"
-  g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast
+  echo "g++ heat_2d_serial.cpp -o heat_2d_serial.out-std=c++11 -Ofast"
+  g++ heat_2d_serial.cpp -o heat_2d_serial.out-std=c++11 -Ofast
   echo "complete!"
 else
   if test -f "./heat_2d_serial.c" 
     then
     echo "Recompiling Source file heat_2d_serial.c"
-    echo "gcc heat_2d_serial.c -o heat_2d_serial -Ofast"
-    gcc heat_2d_serial.c -o heat_2d_serial -Ofast
+    echo "gcc heat_2d_serial.c -o heat_2d_serial.out-Ofast"
+    gcc heat_2d_serial.c -o heat_2d_serial.out-Ofast
     echo "complete!"
   else
     cp /shared/wells_class/2D_heat_transfer/heat_2d_serial.cpp .
     echo "Recompiling Reference Serial Source file heat_2d_serial.cpp"
-    echo "g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast"
-    g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast
+    echo "g++ heat_2d_serial.cpp -o heat_2d_serial.out-std=c++11 -Ofast"
+    g++ heat_2d_serial.cpp -o heat_2d_serial.out-std=c++11 -Ofast
     echo "complete!"
   fi  
 fi  

@@ -2,7 +2,7 @@
 
 include ../config/toolchains.mk
 
-CXXFLAGS += -O3 -ffast-math
+CPPFLAGS += -O3 -ffast-math
 # add -march=native if you are brave and want optimizations
 
 .PHONY: all clean

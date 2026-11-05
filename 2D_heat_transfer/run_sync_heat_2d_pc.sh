@@ -11,21 +11,21 @@
 if test -f "./heat_2d_serial.cpp" 
   then
   echo "Recompiling Reference Serial Source file heat_2d_serial.cpp"
-  echo "g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast"
-  g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast
+  echo "g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast"
+  g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast
   echo "complete!"
 else
   if test -f "./heat_2d_serial.c" 
     then
     echo "Recompiling Source file heat_2d_serial.c"
-    echo "gcc heat_2d_serial.c -o heat_2d_serial -Ofast"
-    gcc heat_2d_serial.c -o heat_2d_serial -Ofast
+    echo "gcc heat_2d_serial.c -o heat_2d_serial.out -Ofast"
+    gcc heat_2d_serial.c -o heat_2d_serial.out -Ofast
     echo "complete!"
   else
     cp /shared/wells_class/2D_heat_transfer/heat_2d_serial.cpp .
     echo "Recompiling Reference Serial Source file heat_2d_serial.cpp"
-    echo "g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast"
-    g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast
+    echo "g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast"
+    g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast
     echo "complete!"
   fi  
 fi  
@@ -33,22 +33,22 @@ fi
 if test -f "./heat_2d_sync_MPI.cpp" 
   then
   echo "Recompiling Source file heat_2d_sync_MPI.cpp"
-  echo "mpic++ heat_2d_sync_MPI.cpp -o heat_2d_sync_MPI -std=c++11 -Ofast"
-  mpic++ heat_2d_sync_MPI.cpp -o heat_2d_sync_MPI -std=c++11 -Ofast
+  echo "mpic++ heat_2d_sync_MPI.cpp -o heat_2d_sync_MPI.out -std=c++11 -Ofast"
+  mpic++ heat_2d_sync_MPI.cpp -o heat_2d_sync_MPI.out -std=c++11 -Ofast
   echo "complete!"
 else
   if test -f "./heat_2d_sync_MPI2.cpp" 
     then
     echo "Recompiling Source file heat_2d_sync_MPI2.cpp"
-    echo "mpic++ heat_2d_sync_MPI2.cpp -o heat_2d_sync_MPI -std=c++11 -Ofast"
-    mpic++ heat_2d_sync_MPI2.cpp -o heat_2d_sync_MPI -std=c++11 -Ofast
+    echo "mpic++ heat_2d_sync_MPI2.cpp -o heat_2d_sync_MPI.out -std=c++11 -Ofast"
+    mpic++ heat_2d_sync_MPI2.cpp -o heat_2d_sync_MPI.out -std=c++11 -Ofast
     echo "complete!"
   else
     if test -f "./heat_2d_sync_MPI.c" 
       then
       echo "Recompiling Source file heat_2d_sync_MPI.c"
-      echo "mpicc heat_2d_sync_MPI.c -o heat_2d_sync_MPI -Ofast"
-      mpicc heat_2d_sync_MPI.c -o heat_2d_sync_MPI -Ofast
+      echo "mpicc heat_2d_sync_MPI.c -o heat_2d_sync_MPI.out -Ofast"
+      mpicc heat_2d_sync_MPI.c -o heat_2d_sync_MPI.out -Ofast
       echo "complete!"
     else
       echo "No valid source file found!"
