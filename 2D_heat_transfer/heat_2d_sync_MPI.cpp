@@ -100,18 +100,18 @@ void compute_temp() {
                 MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
             // send ghost point row to upward adjacent MPI process (rank+1)
-            MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
+            MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
                 MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
 
             // send ghost point row to downward adjacent MPI process (rank-1)
-            MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
+            MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
                 down_pr,123,MPI_COMM_WORLD);
         } else { // even-number process
             // send ghost point row to upward adjacent MPI process (rank+1)
-            MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
+            MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
                 MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
             // send ghost point row to downward adjacent MPI process (rank-1)
-            MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
+            MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
                 down_pr,123,MPI_COMM_WORLD);
             // receive ghost point row from upward adjacent MPI process (rank+1)
             MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
@@ -190,7 +190,9 @@ void print_temp(void) {
         }
         std::cout << std::endl << std::flush;
         // send synchronization back to root so it can continue
-        MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
 }
 // Routine that performs a simple 64 integer checksum
@@ -249,7 +251,9 @@ unsigned long long int checksum(void) {
             num=Temp(active_rows_on_proc+1,col);
             sum += (*num_ptr);
         }
-        MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
     return sum;
 }
