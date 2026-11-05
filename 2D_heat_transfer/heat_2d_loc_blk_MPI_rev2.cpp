@@ -89,22 +89,40 @@ void compute_temp() {
     double *temp_buf = new double[total_rows_on_proc*total_cols];
 
     for (int i=0;i<num_iterations;i++) {
-      // Begin of communication phase, Section 1
-        // send ghost point row to upward adjacent MPI process (rank+1)
-        MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
-            MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
-        // send ghost point row to downward adjacent MPI process (rank-1)
-        MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
-            down_pr,123,MPI_COMM_WORLD);
-        // receive ghost point row from upward adjacent MPI process (rank+1)
-        MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
-            MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-        // receive ghost point row from downward adjacent MPI process (rank-1)
-        MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
-            MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-      // End of communication phase, Section 1
+        // Begin of communication phase, Section 1
+        if (rank & 1) { // odd-number process
+            // receive ghost point row from upward adjacent MPI process (rank+1)
+            MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
+                MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
-      // Start local stenciled computation phase, Section 2
+            // receive ghost point row from downward adjacent MPI process (rank-1)
+            MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
+                MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+
+            // send ghost point row to upward adjacent MPI process (rank+1)
+            MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
+                MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+
+            // send ghost point row to downward adjacent MPI process (rank-1)
+            MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
+                down_pr,123,MPI_COMM_WORLD);
+        } else { // even-number process
+            // send ghost point row to upward adjacent MPI process (rank+1)
+            MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
+                MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+            // send ghost point row to downward adjacent MPI process (rank-1)
+            MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
+                down_pr,123,MPI_COMM_WORLD);
+            // receive ghost point row from upward adjacent MPI process (rank+1)
+            MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
+                MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+            // receive ghost point row from downward adjacent MPI process (rank-1)
+            MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
+                MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+        }
+        // End of communication phase, Section 1
+
+        // Start local stenciled computation phase, Section 2
         for (int j=1;j<=active_rows_on_proc;j++) {
             for (int k=1;k<=total_cols-2;k++) {
                 Temp_buf(j,k)=0.25*(Temp(j-1,k)+Temp(j+1,k)+
@@ -295,10 +313,8 @@ int main (int argc, char *argv[]){
     int rowrem = n % numprocs;
 
     if (rank < rowrem) {
-        // active_rows_on_proc = std::ceil(static_cast<double>(n)/numprocs);
         active_rows_on_proc = rowdiv + 1;
     } else {
-        // active_rows_on_proc = std::floor(static_cast<double>(n)/numprocs);
         active_rows_on_proc = rowdiv;
     }
 
