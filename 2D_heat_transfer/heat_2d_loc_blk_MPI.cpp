@@ -1,4 +1,4 @@
-// 2-D temperature Example with (unsafe) Locally Blocking 
+// 2-D temperature Example with (unsafe) Locally Blocking
 // MPI_Send/MPI_Recv Routines
 // Standard C MPI Binding Version
 
@@ -14,7 +14,7 @@ To execute on the Picocluster System
          #!/bin/bash
          mpiexec ./heat_2d_loc_blk_MPI 10 100
          # execute a 10 x 10 point 2d-heat transfer problem
-         # for 100 iterations 
+         # for 100 iterations
 */
 
 #include <stdlib.h>
@@ -26,11 +26,11 @@ To execute on the Picocluster System
 const int ROOM_TEMP=20;       // temperature everywhere except the fireplace
 const int FIREPLACE_TEMP=100; // temperature at upper/middle boundary
 
-int n;                // number of non boundary condition rows in problem 
+int n;                // number of non boundary condition rows in problem
 int num_iterations;   // number of successive iterations before terminating
 
 int numprocs,rank;   // number of MPI processes and process ID
-int up_pr;           // logical up processor   
+int up_pr;           // logical up processor
 int down_pr;         // logical down processor
 
 int active_rows_on_proc; // number of non boundary condition/ghost
@@ -46,7 +46,7 @@ double *temp;             // pointer to MPI process local temperature
                           // array row-ordered storage
 
 // Old style macro to give the illusion of 2D memory
-#define Temp(x,y) temp[(x)*total_cols+y] 
+#define Temp(x,y) temp[(x)*total_cols+y]
 
 // routine to initialize the temperature vector and the temperature at the
 // boundary
@@ -74,15 +74,15 @@ void init_temp(void) {
         }
     }
 }
-// main compute/communication region -- allows for temperature diffusion 
-// to occur one iteration at a time until the specified number of 
+// main compute/communication region -- allows for temperature diffusion
+// to occur one iteration at a time until the specified number of
 // iterations has been performed
 //
 // Section 1: Nearest-neighbor ghost point reconciliation
 //
 // Section 2: Local Computation Phase -- stenciled computation
 //                                       using ghost points
-// 
+//
 void compute_temp() {
     MPI_Status status;
     #define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
@@ -104,7 +104,7 @@ void compute_temp() {
             MPI_ANY_TAG,MPI_COMM_WORLD,&status);
       // End of communication phase, Section 1
 
-      // Start local stenciled computation phase, Section 2 
+      // Start local stenciled computation phase, Section 2
         for (int j=1;j<=active_rows_on_proc;j++) {
             for (int k=1;k<=total_cols-2;k++) {
                 Temp_buf(j,k)=0.25*(Temp(j-1,k)+Temp(j+1,k)+
@@ -112,21 +112,21 @@ void compute_temp() {
             }
         }
         for (int j=1;j<=active_rows_on_proc;j++) {
-            for (int k=1;k<=total_cols-2;k++) { 
+            for (int k=1;k<=total_cols-2;k++) {
                 Temp (j,k)=Temp_buf(j,k);
             }
         }
       // End computation phase, Section 2
     }
-    delete temp_buf;
+    delete[] temp_buf;
 }
-// routine to display temperature values at each point including the 
+// routine to display temperature values at each point including the
 // boundary points
 void print_temp(void) {
     char flg;
     MPI_Status status;
 
-    // wait for turn to print out local temp array 
+    // wait for turn to print out local temp array
     if (rank!=0) {
         // if not rank 0 wait until adjacent left process has completed
         MPI_Recv(&flg,1,MPI_CHAR,down_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
@@ -150,10 +150,10 @@ void print_temp(void) {
     }
     std::cout << std::flush;
 
-    // if you are not the last MPI process send a synchronization message to 
+    // if you are not the last MPI process send a synchronization message to
     // down most adjacent process to indicate that it is now that processes
     // turn to send its data. if this is the last process then
-    // the communication is skipped but the lower boundary condition 
+    // the communication is skipped but the lower boundary condition
     // row is outputed instead.
     if (rank!=numprocs-1) {
         MPI_Send(&flg,1,MPI_CHAR,up_pr,123,MPI_COMM_WORLD);
@@ -187,7 +187,7 @@ unsigned long long int checksum(void) {
     double num;
     num_ptr = (unsigned long long int *) &num;
 
-    // wait for turn to compute checksum for portion of 
+    // wait for turn to compute checksum for portion of
     // Temperature data
     if (rank!=0) {
         // if not rank 0 wait until adjacent left process has completed
@@ -213,10 +213,10 @@ unsigned long long int checksum(void) {
     }
 
     // if you are not the last MPI process send current checksum which also
-    // serves as a synchronization message to the 
+    // serves as a synchronization message to the
     // down most adjacent process to indicate that it is now that processes
     // turn to send its data. if this is the last process then
-    // the communication is skipped but the lower boundary condition 
+    // the communication is skipped but the lower boundary condition
     // row's checksum is added to the checksum.
     if (rank!=numprocs-1) {
         MPI_Send(&sum,sizeof(double),MPI_CHAR,up_pr,123,MPI_COMM_WORLD);
@@ -234,7 +234,7 @@ unsigned long long int checksum(void) {
         MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
     }
     return sum;
-} 
+}
 
 
 void print_usage_instructions(char *command) {
@@ -269,11 +269,11 @@ int main (int argc, char *argv[]){
     // global constants at run time
     //   n,num_iterations,up_pr, down_pr,
     //   active_rows_on_proc,total_rows_on_proc,
-    //   total_cols, and temp array   
+    //   total_cols, and temp array
 
     // get total number of points not counting boundary points
-    // from first command line argument 
-    // Warning No Error Checking 
+    // from first command line argument
+    // Warning No Error Checking
     n = atoi(argv[1]);
 
     // get total number of iterations to run simulation
@@ -289,10 +289,10 @@ int main (int argc, char *argv[]){
     if (down_pr<0) { down_pr = MPI_PROC_NULL; }
 
     // define the number of rows that the MPI process
-    // is to process 
+    // is to process
     active_rows_on_proc = n/numprocs;
 
-    // set total rows on MPI process including boundary 
+    // set total rows on MPI process including boundary
     // points
     total_rows_on_proc = active_rows_on_proc+2;
 
@@ -301,7 +301,7 @@ int main (int argc, char *argv[]){
 
     // dynamically allocate memory to store the MPI process
     // local temp array
-    temp = new double [total_rows_on_proc*total_cols]; 
+    temp = new double [total_rows_on_proc*total_cols];
 
     // initialize MPI processtemperature matrix
     init_temp();
@@ -311,7 +311,7 @@ int main (int argc, char *argv[]){
 
     // compute temperatures returning after specified number
     // of iterations
-    compute_temp(); 
+    compute_temp();
 
     // time interval calculation associated with MPI process
     time = MPI_Wtime()-time; // new time = end time - start time
@@ -366,7 +366,7 @@ int main (int argc, char *argv[]){
         }
     }
 
-    delete temp;
+    delete[] temp;
 
     // Terminate MPI Program -- perform necessary MPI housekeeping
     // clear out all buffers, remove handlers, etc.

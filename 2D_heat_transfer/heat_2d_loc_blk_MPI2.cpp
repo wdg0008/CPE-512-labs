@@ -119,7 +119,7 @@ void compute_temp() {
         }
       // End computation phase, Section 2
     }
-    delete temp_buf;
+    delete[] temp_buf;
 }
 // routine to display temperature values at each point including the 
 // boundary points
@@ -366,7 +366,7 @@ int main (int argc, char *argv[]){
         }
     }
 
-    delete temp;
+    delete[] temp;
 
     // Terminate MPI Program -- perform necessary MPI housekeeping
     // clear out all buffers, remove handlers, etc.
