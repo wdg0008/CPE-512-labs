@@ -12,8 +12,8 @@ cp /home/shared/wells_class/2D_heat_transfer/heat_2d_serial.cpp .
 if test -f "./heat_2d_serial.cpp" 
   then
   echo "Recompiling Reference Serial Source file heat_2d_serial.cpp"
-  echo "g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast"
-  g++ heat_2d_serial.cpp -o heat_2d_serial -std=c++11 -Ofast
+  echo "g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast"
+  g++ heat_2d_serial.cpp -o heat_2d_serial.out -std=c++11 -Ofast
   echo "complete!"
 else
   echo "No valid serial source file found!"
@@ -24,8 +24,8 @@ fi
 if test -f "./heat_2d_OMP.cpp" 
   then
   echo "Recompiling Source file heat_2d_OMP.cpp"
-  echo "g++ heat_2d_OMP.cpp -o heat_2d_OMP -fopenmp -std=c++11 -Ofast"
-  g++ heat_2d_OMP.cpp -o heat_2d_OMP -fopenmp -std=c++11 -Ofast
+  echo "g++ heat_2d_OMP.cpp -o heat_2d_OMP.out -fopenmp -std=c++11 -Ofast"
+  g++ heat_2d_OMP.cpp -o heat_2d_OMP.out -fopenmp -std=c++11 -Ofast
   echo "complete!"
   # copy mpi scripts to the current directory
   echo "Copying script files to current directory"

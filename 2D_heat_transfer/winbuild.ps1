@@ -15,6 +15,14 @@ $openMpTargets = @(
     "heat_2d_OMP"
 )
 
+$msmpiTargets = @(
+    "heat_2D_loc_blk_MPI",
+    "heat_2D_loc_blk_MPI_rev1",
+    "heat_2D_loc_blk_MPI_rev2",
+    "heat_2d_sync_MPI",
+    "heat_2d_usr_buf_MPI"
+)
+
 foreach ($target in $serialTargets) {
     Build-Serial `
         -Source (Join-Path $PSScriptRoot "$target.cpp") `
@@ -23,6 +31,12 @@ foreach ($target in $serialTargets) {
 
 foreach ($target in $openMpTargets) {
     Build-OpenMP `
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
+}
+
+foreach ($target in $msmpiTargets) {
+    Build-MSMPI `
         -Source (Join-Path $PSScriptRoot "$target.cpp") `
         -Output (Join-Path $PSScriptRoot "$target.exe")
 }
