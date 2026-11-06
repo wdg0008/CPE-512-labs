@@ -88,13 +88,22 @@ void compute_temp() {
     #define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
     double *temp_buf = new double[total_rows_on_proc*total_cols];
 
+    int rowSize = sizeof(temp[0]) * total_cols;
+    int bufSize = (rowSize + MPI_BSEND_OVERHEAD) * 2;
+    char *buf = new char[bufSize];
+
+    MPI_Buffer_attach(buf, bufSize);
+
     for (int i=0;i<num_iterations;i++) {
       // Begin of communication phase, Section 1
+
+        
+
         // send ghost point row to upward adjacent MPI process (rank+1)
-        MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
+        MPI_Bsend(&temp[active_rows_on_proc*total_cols],total_cols,
             MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
         // send ghost point row to downward adjacent MPI process (rank-1)
-        MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
+        MPI_Bsend(&temp[total_cols],total_cols,MPI_DOUBLE,
             down_pr,123,MPI_COMM_WORLD);
         // receive ghost point row from upward adjacent MPI process (rank+1)
         MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
@@ -118,7 +127,11 @@ void compute_temp() {
         }
       // End computation phase, Section 2
     }
+
+    MPI_Buffer_detach(buf, &bufSize);
+    
     delete[] temp_buf;
+    delete[] buf;
 }
 // routine to display temperature values at each point including the
 // boundary points
@@ -172,7 +185,9 @@ void print_temp(void) {
         }
         std::cout << std::endl << std::flush;
         // send synchronization back to root so it can continue
-        MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
 }
 // Routine that performs a simple 64 integer checksum
@@ -231,7 +246,9 @@ unsigned long long int checksum(void) {
             num=Temp(active_rows_on_proc+1,col);
             sum += (*num_ptr);
         }
-        MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
     return sum;
 }
