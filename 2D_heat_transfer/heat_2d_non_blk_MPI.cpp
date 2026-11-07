@@ -176,7 +176,9 @@ void print_temp(void) {
         }
         std::cout << std::endl << std::flush;
         // send synchronization back to root so it can continue
-        MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
 }
 // Routine that performs a simple 64 integer checksum
@@ -235,7 +237,9 @@ unsigned long long int checksum(void) {
             num=Temp(active_rows_on_proc+1,col);
             sum += (*num_ptr);
         }
-        MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
     return sum;
 }

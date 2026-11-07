@@ -92,17 +92,15 @@ void compute_temp() {
     for (int i=0;i<num_iterations;i++) {
       // Begin of communication phase, Section 1
         // send ghost point row to upward adjacent MPI process (rank+1)
-        MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
-            MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+        MPI_Sendrecv(&temp[active_rows_on_proc*total_cols], total_cols, MPI_DOUBLE, up_pr, 123,
+                     &temp[(active_rows_on_proc+1)*total_cols], total_cols, MPI_DOUBLE, up_pr, MPI_ANY_TAG,
+                     MPI_COMM_WORLD, &status);
+
         // send ghost point row to downward adjacent MPI process (rank-1)
-        MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
-            down_pr,123,MPI_COMM_WORLD);
-        // receive ghost point row from upward adjacent MPI process (rank+1)
-        MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
-            MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-        // receive ghost point row from downward adjacent MPI process (rank-1)
-        MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
-            MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+        MPI_Sendrecv(&temp[total_cols], total_cols, MPI_DOUBLE, down_pr, 123,
+                     &temp[0], total_cols, MPI_DOUBLE, down_pr, MPI_ANY_TAG,
+                     MPI_COMM_WORLD, &status);
+
       // End of communication phase, Section 1
 
       // Start local stenciled computation phase, Section 2
@@ -173,7 +171,9 @@ void print_temp(void) {
         }
         std::cout << std::endl << std::flush;
         // send synchronization back to root so it can continue
-        MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&flg,1,MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
 }
 // Routine that performs a simple 64 integer checksum
@@ -232,7 +232,9 @@ unsigned long long int checksum(void) {
             num=Temp(active_rows_on_proc+1,col);
             sum += (*num_ptr);
         }
-        MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        if (numprocs > 1) {
+            MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+        }
     }
     return sum;
 }
