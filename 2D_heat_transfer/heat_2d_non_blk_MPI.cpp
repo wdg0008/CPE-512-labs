@@ -85,24 +85,27 @@ void init_temp(void) {
 //                                       using ghost points
 //
 void compute_temp() {
-    MPI_Status status;
+    MPI_Request requests[4];
     #define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
     double *temp_buf = new double[total_rows_on_proc*total_cols];
 
     for (int i=0;i<num_iterations;i++) {
       // Begin of communication phase, Section 1
         // send ghost point row to upward adjacent MPI process (rank+1)
-        MPI_Send(&temp[active_rows_on_proc*total_cols],total_cols,
-            MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+        MPI_Isend(&temp[active_rows_on_proc*total_cols],total_cols,
+            MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD,&requests[0]);
         // send ghost point row to downward adjacent MPI process (rank-1)
-        MPI_Send(&temp[total_cols],total_cols,MPI_DOUBLE,
-            down_pr,123,MPI_COMM_WORLD);
+        MPI_Isend(&temp[total_cols],total_cols,MPI_DOUBLE,
+            down_pr,123,MPI_COMM_WORLD,&requests[1]);
+
         // receive ghost point row from upward adjacent MPI process (rank+1)
-        MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
-            MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+        MPI_Irecv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
+            MPI_DOUBLE, up_pr,123,MPI_COMM_WORLD,&requests[2]);
         // receive ghost point row from downward adjacent MPI process (rank-1)
-        MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
-            MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+        MPI_Irecv(&temp[0],total_cols,MPI_DOUBLE,down_pr,123,
+            MPI_COMM_WORLD,&requests[3]);
+
+        MPI_Waitall(4, requests, MPI_STATUSES_IGNORE);
       // End of communication phase, Section 1
 
       // Start local stenciled computation phase, Section 2
