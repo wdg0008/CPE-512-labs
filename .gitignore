@@ -178,6 +178,11 @@ wells_class
 *_test.sh
 !.gitattributes
 
+# output files for HW #8 benchmark GNU Plots
+/2D_heat_transfer/sync_*
+/2D_heat_transfer/heat_2d_serial
+/2D_heat_transfer/heat_2d_sync_MPI
+
 # all the other junk
 .*
 
