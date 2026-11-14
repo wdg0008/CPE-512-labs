@@ -9,9 +9,11 @@ CPPFLAGS += -O3 -ffast-math
 
 .PHONY: all clean
 
-EXES := heat_2d_serial.out heat_2d_OMP.out heat_2d_loc_blk_MPI_rev1.out \
-		heat_2d_loc_blk_MPI_rev2.out heat_2d_loc_blk_MPI.out \
-		heat_2d_sync_MPI.out heat_2d_serial_c.out heat_2d_usr_buf_MPI.out
+EXES := heat_2d_serial.out heat_2d_serial_c.out heat_2d_OMP.out \
+		heat_2d_loc_blk_MPI.out \
+		heat_2d_loc_blk_MPI_rev1.out heat_2d_loc_blk_MPI_rev2.out \
+		heat_2d_sync_MPI.out heat_2d_usr_buf_MPI.out \
+		heat_2d_non_blk_MPI.out heat_2d_snd_rcv_MPI.out
 
 ifeq ($(ASAX),1)
 EXES += heat_2d_loc_blk_MPI2.out

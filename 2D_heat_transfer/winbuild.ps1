@@ -20,7 +20,9 @@ $msmpiTargets = @(
     "heat_2D_loc_blk_MPI_rev1",
     "heat_2D_loc_blk_MPI_rev2",
     "heat_2d_sync_MPI",
-    "heat_2d_usr_buf_MPI"
+    "heat_2d_usr_buf_MPI",
+    "heat_2d_non_blk_MPI",
+    "heat_2d_snd_rcv_MPI"
 )
 
 foreach ($target in $serialTargets) {
