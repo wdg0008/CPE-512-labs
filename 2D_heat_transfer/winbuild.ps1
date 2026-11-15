@@ -42,3 +42,8 @@ foreach ($target in $msmpiTargets) {
         -Source (Join-Path $PSScriptRoot "$target.cpp") `
         -Output (Join-Path $PSScriptRoot "$target.exe")
 }
+
+# special invocation to pass additional flags for OpenMP
+Build-MSMPI -Source (Join-Path $PSScriptRoot "heat_2d_MPI_OMP.cpp") `
+    -Output (Join-Path $PSScriptRoot "heat_2d_MPI_OMP.exe") `
+    -ExtraFlags '/openmp'
