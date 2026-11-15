@@ -88,6 +88,7 @@ void compute_temp() {
     #define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
     double *temp_buf = new double[total_rows_on_proc*total_cols];
 
+    // only the first thread on each process has to communicate with others
     for (int i=0;i<num_iterations;i++) {
         // Begin of communication phase, Section 1
         if (rank & 1) { // odd-number process
@@ -120,21 +121,26 @@ void compute_temp() {
             MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
                 MPI_ANY_TAG,MPI_COMM_WORLD,&status);
         }
-        // End of communication phase, Section 1
+        
+        // OpenMP used on each node to further subdivide once boundary conditions known
+        #pragma omp parallel
+        {
+            #pragma omp for schedule(static)
+            for (int j=1;j<=active_rows_on_proc;j++) {
+                for (int k=1;k<=total_cols-2;k++) {
+                    Temp_buf(j,k)=0.25*(Temp(j-1,k)+Temp(j+1,k)+
+                            Temp(j,k-1)+Temp(j,k+1));
+                }
+            }
 
-        // Start local stenciled computation phase, Section 2
-        for (int j=1;j<=active_rows_on_proc;j++) {
-            for (int k=1;k<=total_cols-2;k++) {
-                Temp_buf(j,k)=0.25*(Temp(j-1,k)+Temp(j+1,k)+
-                        Temp(j,k-1)+Temp(j,k+1));
+            #pragma omp for schedule(static)
+            for (int j=1;j<=active_rows_on_proc;j++) {
+                for (int k=1;k<=total_cols-2;k++) {
+                    Temp (j,k)=Temp_buf(j,k);
+                }
             }
         }
-        for (int j=1;j<=active_rows_on_proc;j++) {
-            for (int k=1;k<=total_cols-2;k++) {
-                Temp (j,k)=Temp_buf(j,k);
-            }
-        }
-      // End computation phase, Section 2
+        // End computation phase, Section 2
     }
     delete[] temp_buf;
 }
