@@ -88,43 +88,47 @@ void compute_temp() {
     #define Temp_buf(x,y) temp_buf[(x)*total_cols+y] // *(temp_buf+x*total_cols+y)
     double *temp_buf = new double[total_rows_on_proc*total_cols];
 
-    // only the first thread on each process has to communicate with others
-    for (int i=0;i<num_iterations;i++) {
-        // Begin of communication phase, Section 1
-        if (rank & 1) { // odd-number process
-            // receive ghost point row from upward adjacent MPI process (rank+1)
-            MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
-                MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+    #pragma omp parallel
+    {
+        for (int i=0;i<num_iterations;i++) {
+            // Begin of communication phase, Section 1
+            #pragma omp master
+            {
+                if (rank & 1) { // odd-number process
+                    // receive ghost point row from upward adjacent MPI process (rank+1)
+                    MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
+                        MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
-            // receive ghost point row from downward adjacent MPI process (rank-1)
-            MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
-                MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+                    // receive ghost point row from downward adjacent MPI process (rank-1)
+                    MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
+                        MPI_ANY_TAG,MPI_COMM_WORLD,&status);
 
-            // send ghost point row to upward adjacent MPI process (rank+1)
-            MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
-                MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+                    // send ghost point row to upward adjacent MPI process (rank+1)
+                    MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
+                        MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
 
-            // send ghost point row to downward adjacent MPI process (rank-1)
-            MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
-                down_pr,123,MPI_COMM_WORLD);
-        } else { // even-number process
-            // send ghost point row to upward adjacent MPI process (rank+1)
-            MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
-                MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
-            // send ghost point row to downward adjacent MPI process (rank-1)
-            MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
-                down_pr,123,MPI_COMM_WORLD);
-            // receive ghost point row from upward adjacent MPI process (rank+1)
-            MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
-                MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-            // receive ghost point row from downward adjacent MPI process (rank-1)
-            MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
-                MPI_ANY_TAG,MPI_COMM_WORLD,&status);
-        }
-        
-        // OpenMP used on each node to further subdivide once boundary conditions known
-        #pragma omp parallel
-        {
+                    // send ghost point row to downward adjacent MPI process (rank-1)
+                    MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
+                        down_pr,123,MPI_COMM_WORLD);
+                } else { // even-number process
+                    // send ghost point row to upward adjacent MPI process (rank+1)
+                    MPI_Ssend(&temp[active_rows_on_proc*total_cols],total_cols,
+                        MPI_DOUBLE,up_pr,123,MPI_COMM_WORLD);
+                    // send ghost point row to downward adjacent MPI process (rank-1)
+                    MPI_Ssend(&temp[total_cols],total_cols,MPI_DOUBLE,
+                        down_pr,123,MPI_COMM_WORLD);
+                    // receive ghost point row from upward adjacent MPI process (rank+1)
+                    MPI_Recv(&temp[(active_rows_on_proc+1)*total_cols],total_cols,
+                        MPI_DOUBLE, up_pr,MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+                    // receive ghost point row from downward adjacent MPI process (rank-1)
+                    MPI_Recv(&temp[0],total_cols,MPI_DOUBLE,down_pr,
+                        MPI_ANY_TAG,MPI_COMM_WORLD,&status);
+                }
+            }
+
+            #pragma omp barrier
+            
+            // OpenMP used on each node to further subdivide once boundary conditions known
             #pragma omp for schedule(static)
             for (int j=1;j<=active_rows_on_proc;j++) {
                 for (int k=1;k<=total_cols-2;k++) {
@@ -139,8 +143,8 @@ void compute_temp() {
                     Temp (j,k)=Temp_buf(j,k);
                 }
             }
+            // End computation phase, Section 2
         }
-        // End computation phase, Section 2
     }
     delete[] temp_buf;
 }
@@ -281,9 +285,19 @@ void print_usage_instructions(char *command) {
 
 int main (int argc, char *argv[]){
 
-    MPI_Init(&argc,&argv); // initalize MPI environment
+    int mpi_thread_level;
+    MPI_Init_thread(&argc,&argv,MPI_THREAD_FUNNELED,&mpi_thread_level);
     MPI_Comm_size(MPI_COMM_WORLD,&numprocs); // find total number of MPI tasks
     MPI_Comm_rank(MPI_COMM_WORLD,&rank);     // get unique task id number
+
+    // must use MPI_THREAD_FUNNELED so that only master does MPI communication
+    if (mpi_thread_level < MPI_THREAD_FUNNELED) {
+        if (rank == 0) {
+            std::cerr << "MPI implementation does not provide MPI_THREAD_FUNNELED"
+                      << std::endl;
+        }
+        MPI_Abort(MPI_COMM_WORLD,1);
+    }
 
     if (argc!=3 && argc!=4) {
         if (rank==0) {
