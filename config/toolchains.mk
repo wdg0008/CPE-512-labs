@@ -60,6 +60,13 @@ JUNK := *.i* *.o* *.exe *.obj
 # ORDER MATTERS ON MACOS BSD-STYLE MAKE!!!!!
 # Place general rules at the bottom, and more specific rules at the top.
 
+# Combo MPI and OpenMP code
+%_MPI_OMP.out: %_MPI_OMP.cpp
+ifeq ($(ASAX),1)
+	module load openmpi
+endif
+	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
+
 # C-binding MPI code using OpenMPI
 %_MPI.out: %_MPI.cpp
 ifeq ($(ASAX),1)
