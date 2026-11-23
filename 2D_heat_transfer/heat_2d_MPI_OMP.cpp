@@ -211,7 +211,6 @@ void print_temp(void) {
 // results to insure that modifications to the original
 // program did not affect the accuracy of the computation
 unsigned long long int checksum(void) {
-    char flg;
     MPI_Status status;
     unsigned long long int *num_ptr,sum = 0;
     double num;
@@ -221,7 +220,7 @@ unsigned long long int checksum(void) {
     // Temperature data
     if (rank!=0) {
         // if not rank 0 wait until adjacent left process has completed
-        MPI_Recv(&sum,sizeof(double),MPI_CHAR,down_pr,MPI_ANY_TAG,
+        MPI_Recv(&sum,1,MPI_UNSIGNED_LONG_LONG,down_pr,MPI_ANY_TAG,
                 MPI_COMM_WORLD,&status);
     }
     else {
@@ -249,9 +248,9 @@ unsigned long long int checksum(void) {
     // the communication is skipped but the lower boundary condition
     // row's checksum is added to the checksum.
     if (rank!=numprocs-1) {
-        MPI_Send(&sum,sizeof(double),MPI_CHAR,up_pr,123,MPI_COMM_WORLD);
+        MPI_Send(&sum,1,MPI_UNSIGNED_LONG_LONG,up_pr,123,MPI_COMM_WORLD);
         if (rank==0) {
-            MPI_Recv(&sum,sizeof(double),MPI_CHAR,numprocs-1,MPI_ANY_TAG,MPI_COMM_WORLD,
+            MPI_Recv(&sum,1,MPI_UNSIGNED_LONG_LONG,numprocs-1,MPI_ANY_TAG,MPI_COMM_WORLD,
                     &status);
         }
     }
@@ -262,7 +261,7 @@ unsigned long long int checksum(void) {
             sum += (*num_ptr);
         }
         if (numprocs > 1) {
-            MPI_Send(&sum,sizeof(double),MPI_CHAR,0,123,MPI_COMM_WORLD);
+            MPI_Send(&sum,1,MPI_UNSIGNED_LONG_LONG,0,123,MPI_COMM_WORLD);
         }
     }
     return sum;
