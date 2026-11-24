@@ -60,7 +60,7 @@ int convolve(
     const size_t ny = xlen + hlen - 1;
 
     int r;
-    #pragma omp parallel for schedule(static)
+    #pragma omp parallel for schedule(guided)
     for (r = 0; r < ny; r++)
     {
         // max(0, r - hlen + 1); // but check to avoid unsigned underflow
