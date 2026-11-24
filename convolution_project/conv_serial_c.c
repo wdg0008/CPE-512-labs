@@ -10,10 +10,9 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 #include "../ctimer_utils.h"
-
-#define TEST_LEN 32
-#define CONV_LEN (TEST_LEN*2 - 1)
+#include "conv_defs.h"
 
 int convolve(
     const double * restrict x, const size_t xlen,
@@ -47,30 +46,42 @@ int convolve(
 void print_arr(const double * arr, const size_t len)
 {
     printf("{ ");
-    for (size_t i = 0; i < len; i++)
+    for (size_t i = 0; i < len-1; i++)
     {
         printf("%.1lf, ", arr[i]);
     }
-    printf(" }\n");
+    printf("%.1lf }\n", arr[len-1]);
     return;
 }
 
 int main(int argc, char* argv[])
 {
+    bool do_print = true;
+    if (argc >= 2)
+    {
+        if (argv[1][0] == 'S')
+        {
+            do_print = false;
+        }
+    }
+
     double x[TEST_LEN];
     for (int i = 0; i < TEST_LEN; i++)
     {
         x[i] = 1;
     }
 
-    print_arr(x, TEST_LEN);
+    if (do_print)
+        print_arr(x, TEST_LEN);
 
     double y[CONV_LEN] = {0};
 
     TIMER_START;
     convolve(x, TEST_LEN, x, TEST_LEN, y, CONV_LEN);
     TIMER_STOP;
-    print_arr(y, CONV_LEN);
+
+    if (do_print)
+        print_arr(y, CONV_LEN);
 
     printf("Time elapsed (seconds): %lf", TIMER_ELAPSED); 
 
