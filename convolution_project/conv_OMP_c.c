@@ -15,9 +15,9 @@
 #include "conv_defs.h"
 
 int convolve(
-    const double * restrict x, const size_t xlen,
-    const double * restrict h, const size_t hlen,
-    double * restrict y, const size_t ylen)
+    const double * RESTRICT x, const size_t xlen,
+    const double * RESTRICT h, const size_t hlen,
+    double * RESTRICT y, const size_t ylen)
 {
     if (ylen < xlen + hlen - 1)
         return -1;
@@ -48,7 +48,7 @@ int convolve(
     return 0;
 }
 
-void print_arr(const double * arr, const size_t len)
+void print_double_arr(const double * arr, const size_t len)
 {
     printf("{ ");
     for (size_t i = 0; i < len-1; i++)
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     }
 
     if (do_print)
-        print_arr(x, TEST_LEN);
+        print_double_arr(x, TEST_LEN);
 
     double y[CONV_LEN] = {0};
 
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     TIMER_STOP;
 
     if (do_print)
-        print_arr(y, CONV_LEN);
+        print_double_arr(y, CONV_LEN);
 
     printf("Time elapsed (seconds): %lf", TIMER_ELAPSED); 
 
