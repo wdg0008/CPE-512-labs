@@ -7,7 +7,7 @@
 # Subdirectories containing course units. Each unit includes its own toolchain
 # configuration, so these recursive calls do not need exported variables.
 UNITS := 1D_heat_transfer 2D_heat_transfer hello_world tsp_example \
-		 histogram add_numbers
+		 histogram add_numbers convolution_project
 
 # each of these are phony targets, so make will always run the recipe
 .PHONY: all clean $(UNITS)
