@@ -3,7 +3,8 @@
 
 #include <time.h>
 
-struct timespec tv1{}, tv2{};
+struct timespec tv1 = {};
+struct timespec tv2 = {};
 
 #define TIMER_CLEAR \
     do { tv1 = {}; tv2 = {}; } while (0)

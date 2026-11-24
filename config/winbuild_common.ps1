@@ -9,6 +9,12 @@ $script:CommonCxxFlags = @(
     '/Zc:preprocessor'
 )
 
+$script:CommonCFlags = @(
+    '/nologo'
+    '/std:c17'
+    '/W3' # /W4 is too aggressive in most cases.
+)
+
 function Invoke-MSVCBuild {
     [CmdletBinding()]
     param(
@@ -20,19 +26,28 @@ function Invoke-MSVCBuild {
 
         [string[]] $CompilerFlags = @(),
 
-        [string[]] $LinkerFlags = @()
+        [string[]] $LinkerFlags = @(),
+
+        [switch] $CompileAsC
     )
 
     $sourcePath = (Resolve-Path -LiteralPath $Source).Path
     $outputPath = $Output
     $objectPath = [System.IO.Path]::ChangeExtension($outputPath, '.obj')
 
+    $commonFlags = $script:CommonCxxFlags
+    $sourceArgument = $sourcePath
+    if ($CompileAsC) {
+        $commonFlags = $script:CommonCFlags
+        $sourceArgument = "/Tc$sourcePath"
+    }
+
     $arguments = @(
-        $script:CommonCxxFlags
+        $commonFlags
         $CompilerFlags
         "/Fo:$objectPath"
         "/Fe:$outputPath"
-        $sourcePath
+        $sourceArgument
     )
 
     if ($LinkerFlags.Count -gt 0) {
@@ -47,6 +62,30 @@ function Invoke-MSVCBuild {
     if ($LASTEXITCODE -ne 0) {
         throw "MSVC compilation failed for '$sourcePath' (exit code $LASTEXITCODE)."
     }
+}
+
+function Build-C {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Source,
+
+        [string] $Output,
+
+        [string[]] $ExtraFlags = @()
+    )
+
+    if (-not $Output) {
+        $Output = [System.IO.Path]::ChangeExtension(
+            [System.IO.Path]::GetFileName($Source), '.exe'
+        )
+    }
+
+    Invoke-MSVCBuild `
+        -Source $Source `
+        -Output $Output `
+        -CompilerFlags $ExtraFlags `
+        -CompileAsC
 }
 
 function Build-Serial {

@@ -244,4 +244,7 @@ cl /EHsc /std:c++20 .\hello_world_OMP.cpp /Zc:preprocessor /openmp
 # for MPI, assuming you installed MSMPI and its SDK properly
 # (change 64 --> 32 if using a 32-bit system)
 cl.exe /EHsc /std:c++20 /I$env:MSMPI_INC /Fe:hello_world_MPI.exe hello_world_MPI.cpp /link /LIBPATH:$env:MSMPI_LIB64 msmpi.lib
+
+# for C code, forcing C with /Tc
+cl.exe /nologo /std:c17 /W3 /Fe:conv_serial_c.exe /Tc /Zc:preprocessor conv_serial_c.c
 ```
