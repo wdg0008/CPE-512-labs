@@ -27,8 +27,9 @@ int convolve(
     // yes, this is legal, and yes, it is cursed
     _Pragma(STR(omp parallel))
     {
+        int r;
         #pragma omp for schedule(static)
-        for (int r = 0; r < ny; r++)
+        for (r = 0; r < ny; r++)
         {
             // max(0, r - hlen + 1); // but check to avoid unsigned underflow
             const size_t lo = (r >= hlen) ? r - hlen + 1 : 0;

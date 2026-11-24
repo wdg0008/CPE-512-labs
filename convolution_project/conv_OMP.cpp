@@ -59,8 +59,9 @@ int convolve(
 
     const size_t ny = xlen + hlen - 1;
 
+    int r;
     #pragma omp parallel for schedule(static)
-    for (size_t r = 0; r < ny; r++)
+    for (r = 0; r < ny; r++)
     {
         // max(0, r - hlen + 1); // but check to avoid unsigned underflow
         const size_t lo = (r >= hlen) ? r - hlen + 1 : 0;
@@ -118,11 +119,17 @@ int main(int argc, char* argv[])
     }
 
     bool do_print = true;
+    bool is_outptut_csv = false;
     if (argc >= 3)
     {
         if (argv[2][0] == 'S')
         {
             do_print = false;
+        }
+        else if (argv[2][0] == 'C')
+        {
+            do_print = false;
+            is_outptut_csv = true;
         }
     }
 
@@ -155,7 +162,9 @@ int main(int argc, char* argv[])
     if (do_print)
         print_arr(y.get(), conv_len);
 
-    std::cout << "Time elapsed (seconds): " << TIMER_ELAPSED << '\n';
+    if (!is_outptut_csv)
+        std::cout << "Time elapsed (seconds): ";
+    std::cout << TIMER_ELAPSED << '\n';
 
     return EXIT_SUCCESS;
 }

@@ -8,14 +8,38 @@ $CommonRules = Join-Path $RepoRoot "winbuild_common.ps1"
 . $CommonRules
 
 $serialTargets = @(
+    "conv_serial",
+    "conv_span_serial"
 )
 
 $openMpTargets = @(
+    "conv_OMP"
 )
 
-$msmpiTargets = @(
-)
+foreach ($target in $serialTargets) {
+    Build-Serial `
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
+}
+
+foreach ($target in $openMpTargets) {
+    Build-OpenMP `
+        -Source (Join-Path $PSScriptRoot "$target.cpp") `
+        -Output (Join-Path $PSScriptRoot "$target.exe")
+}
 
 Build-C `
     -Source (Join-Path $PSScriptRoot "conv_serial_c.c") `
     -Output (Join-Path $PSScriptRoot "conv_serial_c.exe")
+
+Build-C `
+    -Source (Join-Path $PSScriptRoot "conv_dynamic_serial_c.c") `
+    -Output (Join-Path $PSScriptRoot "conv_dynamic_serial_c.exe")
+Build-C `
+    -Source (Join-Path $PSScriptRoot "conv_OMP_c.c") `
+    -Output (Join-Path $PSScriptRoot "conv_OMP_c.exe") `
+    -ExtraFlags "/openmp"
+Build-C `
+    -Source (Join-Path $PSScriptRoot "conv_dynamic_OMP_c.c") `
+    -Output (Join-Path $PSScriptRoot "conv_dynamic_OMP_c.exe") `
+    -ExtraFlags "/openmp"
