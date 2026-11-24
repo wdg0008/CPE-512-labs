@@ -14,7 +14,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include "../ctimer_utils.h"
-#include "conv_defs.h"
+#include "conv_cdefs.h"
 #include <stdbool.h>
 
 int convolve(

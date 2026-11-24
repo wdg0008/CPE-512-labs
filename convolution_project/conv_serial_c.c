@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "../ctimer_utils.h"
-#include "conv_defs.h"
+#include "conv_cdefs.h"
 
 int convolve(
     const double * RESTRICT x, const size_t xlen,
