@@ -48,6 +48,7 @@ endif
 # Common defaults, applied after platform configuration.
 CFLAGS 	 += -Wall -Wpedantic -std=c17
 CXXFLAGS += -Wall -Wpedantic -std=c++20
+MPICC	 ?= mpicc
 MPICXX   ?= mpic++
 # Build MPICH-dependent targets only when invoked with ASAX=1.
 ASAX ?= 0
@@ -68,6 +69,13 @@ endif
 	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
 # C-binding MPI code using OpenMPI
+
+%_MPI_c.out: %_MPI_c.c
+ifeq ($(ASAX),1)
+	module load openmpi
+endif
+	$(MPICC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+
 %_MPI.out: %_MPI.cpp
 ifeq ($(ASAX),1)
 	module load openmpi
@@ -82,20 +90,36 @@ endif
 	$(MPICXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
 
 # Combo pthreads and OpenMP code
+%_PTH_OMP_c.out: %_PTH_OMP_c.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -pthread $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
+
 %_PTH_OMP.out: %_PTH_OMP.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
 # Compile pthreads code (need special changes for macOS barriers, see. ./1D_heat_transfer/makefile)
+%_PTH_c.out: %_PTH_c.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -pthread $< -o $@
+
 %_PTH.out: %_PTH.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -pthread $< -o $@
 
 # OpenMP code
+%_OMP_c.out: %_OMP_c.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
+
 %_OMP.out: %_OMP.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OMP_CXXFLAGS) $< -o $@ $(OMP_LDFLAGS) $(OMP_LIBS)
 
-# Serial versions of algorithms (catch as many as possible before rule for all other .cpp files)
+# Serial versions of algorithms
+%serial_c.out: %serial_c.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+
 %serial.out: %serial.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $< -o $@
+
+# Regular C code
+%_c.out: %_c.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 # Regular C++ code
 %.out: %.cpp

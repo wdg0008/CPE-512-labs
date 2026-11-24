@@ -7,10 +7,9 @@ CPPFLAGS += -O3 -ffast-math
 
 .PHONY: all clean
 
-EXES := conv_serial.c
+EXES := conv_serial_c.out
 
-conv_serial_c.out: conv_serial_c.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) $< -o $@
+all: $(EXES)
 
 clean:
 	rm -rf $(JUNK)
