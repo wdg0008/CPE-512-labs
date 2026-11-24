@@ -10,6 +10,7 @@ $BuildDirectories = @(
     '1D_heat_transfer'
     '2D_heat_transfer'
     'add_numbers'
+    'convolution_project'
     'hello_world'
     'histogram'
     'tsp_example'

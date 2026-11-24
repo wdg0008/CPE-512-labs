@@ -88,7 +88,7 @@ function Build-C {
         -CompileAsC
 }
 
-function Build-Serial {
+function Build-CXX {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
@@ -109,29 +109,6 @@ function Build-Serial {
         -Source $Source `
         -Output $Output `
         -CompilerFlags $ExtraFlags
-}
-
-function Build-OpenMP {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory)]
-        [string] $Source,
-
-        [string] $Output,
-
-        [string[]] $ExtraFlags = @()
-    )
-
-    if (-not $Output) {
-        $Output = [System.IO.Path]::ChangeExtension(
-            [System.IO.Path]::GetFileName($Source), '.exe'
-        )
-    }
-
-    Invoke-MSVCBuild `
-        -Source $Source `
-        -Output $Output `
-        -CompilerFlags (@('/openmp') + $ExtraFlags)
 }
 
 function Build-MSMPI {

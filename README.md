@@ -248,3 +248,6 @@ cl.exe /EHsc /std:c++20 /I$env:MSMPI_INC /Fe:hello_world_MPI.exe hello_world_MPI
 # for C code, forcing C with /Tc
 cl.exe /nologo /std:c17 /W3 /Fe:conv_serial_c.exe /Tc /Zc:preprocessor conv_serial_c.c
 ```
+
+>[!Note]
+>In Visual Studio, the OpenMP loop index variable must be a signed integral type, so you cannot use `size_t`. See https://learn.microsoft.com/en-us/cpp/error-messages/compiler-errors-2/compiler-error-c3016 for more information.

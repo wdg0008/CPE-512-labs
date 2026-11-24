@@ -17,21 +17,21 @@ $openMpTargets = @(
 )
 
 foreach ($target in $serialTargets) {
-    Build-Serial `
+    Build-CXX `
         -Source (Join-Path $PSScriptRoot "$target.cpp") `
         -Output (Join-Path $PSScriptRoot "$target.exe")
 }
 
 foreach ($target in $openMpTargets) {
-    Build-OpenMP `
+    Build-CXX `
         -Source (Join-Path $PSScriptRoot "$target.cpp") `
-        -Output (Join-Path $PSScriptRoot "$target.exe")
+        -Output (Join-Path $PSScriptRoot "$target.exe") `
+        -ExtraFlags "/openmp"
 }
 
 Build-C `
     -Source (Join-Path $PSScriptRoot "conv_serial_c.c") `
     -Output (Join-Path $PSScriptRoot "conv_serial_c.exe")
-
 Build-C `
     -Source (Join-Path $PSScriptRoot "conv_dynamic_serial_c.c") `
     -Output (Join-Path $PSScriptRoot "conv_dynamic_serial_c.exe")
